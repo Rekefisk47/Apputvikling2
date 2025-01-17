@@ -10,32 +10,24 @@ const port = (process.env.PORT || 8000);
 server.set('port', port);
 server.use(express.static('public'));
 
-function getRoot(req, res, next) {
+server.get("/", (req, res, next) => {
     res.status(HTTP_CODES.SUCCESS.OK).send('Hello World').end();
-}
+});
 
-server.get("/", getRoot);
-
-function getPoem(req, res, next) {
+server.get("/tmp/poem", (req, res, next) => {
     res.status(HTTP_CODES.SUCCESS.OK).send(poem).end();
-}
+});
 
-server.get("/tmp/poem", getPoem);
-
-function getQuote(req, res, next) {
+server.get("/tmp/quote", (req, res, next) => {
     res.status(HTTP_CODES.SUCCESS.OK).send(randomQuote()).end();
-}
+});
 
-server.get("/tmp/quote", getQuote);
-
-function getSum(req, res, next) {
+server.post("/tmp/sum/:a/:b", (req, res, next) => {
     const a = req.params.a;
     const b = req.params.b;
     const sum = calculateSum(a,b);
     res.status(HTTP_CODES.SUCCESS.OK).send({ sum }).end();
-};
-
-server.post("/tmp/sum/:a/:b", getSum);
+});
 
 server.listen(server.get('port'), function () {
     console.log('server running', server.get('port'));
