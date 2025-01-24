@@ -9,7 +9,95 @@
 </head>
 
 <body>
-    <h1>Hello Class</h1>
+    <h1>Deck of Cards</h1>
+    <br>
+    <button id="createBtn">Create deck</button>
+    <button id="shuffleBtn">Shuffle deck</button>
+    <button id="drawBtn">Draw a card</button>
+    <button id="getBtn">Get deck</button>
+    <br><br>
+    <div id="container"></div>
+
+    <script>
+        const createBtn = document.getElementById("createBtn");
+        const shuffleBtn = document.getElementById("shuffleBtn");
+        const drawBtn = document.getElementById("drawBtn");
+        const getBtn = document.getElementById("getBtn");
+        const container = document.getElementById("container");
+
+        createBtn.addEventListener('click', evt => {
+            container.innerHTML = "";
+            createDeck();
+        });
+        shuffleBtn.addEventListener('click', evt => {
+            shuffleDeck();
+        });
+        drawBtn.addEventListener('click', async evt => {
+            const card = await drawCard();
+            container.innerHTML = `${card.value} ${card.suit}`;
+        });
+        getBtn.addEventListener('click', evt => {
+            getDeck();
+        });
+
+        let deck_id;
+
+        async function createDeck() {
+            config = {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+            const response = await fetch("/temp/deck", config);
+            const data = await response.json();
+            console.log(data);
+            deck_id = data.deck_id;
+        } 
+
+        async function shuffleDeck() {
+            config = {
+                method: "PATCH",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+            const response = await fetch(`/temp/deck/shuffle/${deck_id}`, config);
+            const data = await response.json();
+            console.log(data);
+        }
+
+        async function drawCard() {
+            const response = await fetch(`/temp/deck/${deck_id}/card`);
+            const data = await response.json();
+            return data;
+        }
+
+        async function getDeck() {
+            const response = await fetch(`/temp/deck/${deck_id}`);
+            const data = await response.json();
+            console.log(data);
+        } 
+
+
+
+
+        /*
+        fetch("/temp/deck", {
+            method: "POST",
+            headeres: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                "deck_id": 1,
+            })
+        }).then(res => {
+            return  res.json();
+        })
+        .then(data => console.log(data))
+        .catch(error => console.log("Error"))
+        */
+    </script>
 </body>
 
 </html>
