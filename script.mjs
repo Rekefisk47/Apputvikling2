@@ -69,7 +69,11 @@ server.get("/temp/deck/:deck_id", (req, res, next) => {
 server.get("/temp/deck/:deck_id/card", (req, res, next) => {
     const deck = getDeck(req.params.deck_id, decks);
     if(decks.length > 0){
-        res.status(HTTP_CODES.SUCCESS.OK).send(drawCard(deck)).end();
+        if(deck.deck.length == 0){
+            res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No more cards left in deck!").end();
+        }else{
+            res.status(HTTP_CODES.SUCCESS.OK).send(drawCard(deck)).end();
+        }
     }else{
         res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No deck found").end();
     }
