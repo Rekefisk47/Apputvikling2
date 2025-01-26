@@ -10,7 +10,11 @@
 
 <body>
     <h1>Deck of Cards</h1>
-    <br>
+    <p>- You can add the ID of the deck into the input field</p>
+    <p>- If no ID is given, it will use the latest deck created</p>
+    <p>Bugs: When reload page, it can no longer get the latest deck & you have to input ID again.</p>
+    <input id="textInput" type="text" placeholder="Deck ID" onchange="cangeInput();">
+    <br><br>
     <button id="createBtn">Create deck</button>
     <button id="shuffleBtn">Shuffle deck</button>
     <button id="drawBtn">Draw a card</button>
@@ -19,6 +23,7 @@
     <div id="container"></div>
 
     <script>
+        const textInput = document.getElementById("textInput");
         const createBtn = document.getElementById("createBtn");
         const shuffleBtn = document.getElementById("shuffleBtn");
         const drawBtn = document.getElementById("drawBtn");
@@ -41,6 +46,11 @@
         });
 
         let deck_id;
+        let input;
+
+        function cangeInput(){
+            input = textInput.value;
+        }
 
         async function createDeck() {
             config = {
@@ -62,19 +72,34 @@
                     'Content-Type': 'application/json'
                 }
             }
-            const response = await fetch(`/temp/deck/shuffle/${deck_id}`, config);
+            let response;
+            if(input){
+                response = await fetch(`/temp/deck/shuffle/${input}`, config);
+            }else{
+                response = await fetch(`/temp/deck/shuffle/${deck_id}`, config);
+            }
             const data = await response.json();
             console.log(data);
         }
 
         async function drawCard() {
-            const response = await fetch(`/temp/deck/${deck_id}/card`);
+            let response;
+            if(input){
+                response = await fetch(`/temp/deck/${input}/card`);
+            }else{
+                response = await fetch(`/temp/deck/${deck_id}/card`);
+            }
             const data = await response.json();
             return data;
         }
 
         async function getDeck() {
-            const response = await fetch(`/temp/deck/${deck_id}`);
+            let response;
+            if(input){
+                response = await fetch(`/temp/deck/${input}`);
+            }else{
+                response = await fetch(`/temp/deck/${deck_id}`);
+            }
             const data = await response.json();
             console.log(data);
         } 
