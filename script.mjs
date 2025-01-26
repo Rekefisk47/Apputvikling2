@@ -49,17 +49,30 @@ server.post("/temp/deck", async (req, res, next) => {
 
 server.patch("/temp/deck/shuffle/:deck_id", (req, res, next) => {
     const deck = getDeck(req.params.deck_id, decks);
-    shuffleDeck(deck);
-    res.status(HTTP_CODES.SUCCESS.OK).send(deck).end();
+    console.log("deck = " + decks.length);
+    if(decks.length > 0){
+        res.status(HTTP_CODES.SUCCESS.OK).send(deck).end();
+        shuffleDeck(deck);
+    }else{
+        res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No deck found").end();
+    }
 });
 
 server.get("/temp/deck/:deck_id", (req, res, next) => {
-    res.status(HTTP_CODES.SUCCESS.OK).send(getDeck(req.params.deck_id, decks)).end();
+    if(decks.length > 0){
+        res.status(HTTP_CODES.SUCCESS.OK).send(getDeck(req.params.deck_id, decks)).end();
+    }else{
+        res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No deck found").end();
+    }
 });
 
 server.get("/temp/deck/:deck_id/card", (req, res, next) => {
     const deck = getDeck(req.params.deck_id, decks);
-    res.status(HTTP_CODES.SUCCESS.OK).send(drawCard(deck)).end();
+    if(decks.length > 0){
+        res.status(HTTP_CODES.SUCCESS.OK).send(drawCard(deck)).end();
+    }else{
+        res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No deck found").end();
+    }
 });
 //Uke 4-END
 
