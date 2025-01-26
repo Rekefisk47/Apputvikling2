@@ -10,9 +10,11 @@
 
 <body>
     <h1>Deck of Cards</h1>
-    <p>- You can add the ID of the deck into the input field</p>
-    <p>- If no ID is given, it will use the latest deck created</p>
-    <p>Bugs: When reload page, it can no longer get the latest deck & you have to input ID again.</p>
+    <p>- Get 404 When trying to shuffle, draw or get deck before creating any.</p>
+    <p>- Get 404 when you have drawn all cards form the deck.</p>
+    <p>- When reloading page, you edit the latest deck you created. </p>
+    <p>- If enterting a valid input, you edit the deck with that ID.</p>
+    <p>- If entering an ivalid input, you edit the lastest deck you created. (You get NO error message)</p>
     <input id="textInput" type="text" placeholder="Deck ID" onchange="cangeInput();">
     <br><br>
     <button id="createBtn">Create deck</button>
@@ -49,6 +51,9 @@
         let input;
 
         function cangeInput(){
+            input = textInput.value;
+        }
+        window.onload = function(){
             input = textInput.value;
         }
 
@@ -90,6 +95,7 @@
                 response = await fetch(`/temp/deck/${deck_id}/card`);
             }
             const data = await response.json();
+            console.log(data);
             return data;
         }
 

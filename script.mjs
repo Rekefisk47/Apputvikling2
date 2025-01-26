@@ -18,6 +18,7 @@ server.use(express.static('public'));
 server.use(express.json());
 
 const decks = [];
+let lastDeckCreated;
 
 server.get("/", (req, res, next) => {
     res.status(HTTP_CODES.SUCCESS.OK).send('Hello World').end();
@@ -45,12 +46,13 @@ server.post("/temp/deck", async (req, res, next) => {
     const uuid = crypto.randomUUID();
     res.status(HTTP_CODES.SUCCESS.OK).send(createDeck(uuid)).end();
     decks.push(createDeck(uuid));
+    lastDeckCreated = createDeck(uuid).deck_id;
 });
 
 server.patch("/temp/deck/shuffle/:deck_id", (req, res, next) => {
-    const deck = getDeck(req.params.deck_id, decks);
+    const deck = getDeck(req.params.deck_id, decks) || getDeck(lastDeckCreated, decks);
     console.log("deck = " + decks.length);
-    if(decks.length > 0){
+    if(deck != undefined){
         res.status(HTTP_CODES.SUCCESS.OK).send(deck).end();
         shuffleDeck(deck);
     }else{
@@ -59,16 +61,17 @@ server.patch("/temp/deck/shuffle/:deck_id", (req, res, next) => {
 });
 
 server.get("/temp/deck/:deck_id", (req, res, next) => {
-    if(decks.length > 0){
-        res.status(HTTP_CODES.SUCCESS.OK).send(getDeck(req.params.deck_id, decks)).end();
+    const deck = getDeck(req.params.deck_id, decks) || getDeck(lastDeckCreated, decks);
+    if(deck != undefined){
+        res.status(HTTP_CODES.SUCCESS.OK).send(deck).end();
     }else{
         res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No deck found").end();
     }
 });
 
 server.get("/temp/deck/:deck_id/card", (req, res, next) => {
-    const deck = getDeck(req.params.deck_id, decks);
-    if(decks.length > 0){
+    const deck = getDeck(req.params.deck_id, decks) || getDeck(lastDeckCreated, decks);
+    if(deck != undefined){
         if(deck.deck.length == 0){
             res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No more cards left in deck!").end();
         }else{
