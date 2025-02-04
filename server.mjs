@@ -10,10 +10,18 @@ import { drawCard } from "./temp/deck.mjs";
 
 import crypto from 'crypto';
 
+import log from './modules/log.mjs';
+import { LOGG_LEVELS, eventLogger } from './modules/log.mjs';
+
+const ENABLE_LOGGING = false;
+
 const server = express();
 const port = (process.env.PORT || 8000);
 
+const logger = log(LOGG_LEVELS.VERBOSE);
+
 server.set('port', port);
+server.use(logger);
 server.use(express.static('public'));
 server.use(express.json());
 
@@ -21,6 +29,7 @@ const decks = [];
 let lastDeckCreated;
 
 server.get("/", (req, res, next) => {
+    eventLogger("Noen spurte etter root");
     res.status(HTTP_CODES.SUCCESS.OK).send('Hello World').end();
 });
 
@@ -82,6 +91,7 @@ server.get("/temp/deck/:deck_id/card", (req, res, next) => {
     }
 });
 //Uke 4-END
+
 
 server.listen(server.get('port'), function () {
     console.log('server running', server.get('port'));
