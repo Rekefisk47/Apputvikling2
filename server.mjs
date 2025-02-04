@@ -1,39 +1,39 @@
 import express from 'express'
 import HTTP_CODES from './utils/httpCodes.mjs';
+//Uke 3
 import poem from "./tmp/poem.mjs";
 import { randomQuote } from "./tmp/quote.mjs";
 import { calculateSum } from './tmp/sum.mjs';
+//Uke 4
 import { createDeck } from "./temp/deck.mjs";
 import { getDeck } from "./temp/deck.mjs";
 import { shuffleDeck } from "./temp/deck.mjs";
 import { drawCard } from "./temp/deck.mjs";
-
 import crypto from 'crypto';
-
+//Uke 5
 import log from './modules/log.mjs';
 import { LOGG_LEVELS, eventLogger } from './modules/log.mjs';
-
+//----------------------------------------
 const ENABLE_LOGGING = false;
 
 const server = express();
 const port = (process.env.PORT || 8000);
 
 const logger = log(LOGG_LEVELS.VERBOSE);
-
+//----------------------------------------
 server.set('port', port);
 server.use(logger);
 server.use(express.static('public'));
 server.use(express.json());
-
-const decks = [];
-let lastDeckCreated;
+//----------------------------------------
 
 server.get("/", (req, res, next) => {
     eventLogger("Noen spurte etter root");
     res.status(HTTP_CODES.SUCCESS.OK).send('Hello World').end();
 });
 
-//Uke 3
+//---------------------------------------Uke-3---------------------------------------//
+
 server.get("/tmp/poem", (req, res, next) => {
     res.status(HTTP_CODES.SUCCESS.OK).send(poem).end();
 });
@@ -48,9 +48,14 @@ server.post("/tmp/sum/:a/:b", (req, res, next) => {
     const sum = calculateSum(a,b);
     res.status(HTTP_CODES.SUCCESS.OK).send({ sum }).end();
 });
-//Uke 3-END
 
-//Uke 4
+//---------------------------------------Uke-3-END-----------------------------------//
+
+//---------------------------------------Uke-4---------------------------------------//
+
+const decks = [];
+let lastDeckCreated;
+
 server.post("/temp/deck", async (req, res, next) => {
     const uuid = crypto.randomUUID();
     res.status(HTTP_CODES.SUCCESS.OK).send(createDeck(uuid)).end();
@@ -90,8 +95,8 @@ server.get("/temp/deck/:deck_id/card", (req, res, next) => {
         res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No deck found").end();
     }
 });
-//Uke 4-END
 
+//---------------------------------------Uke-4-END-----------------------------------//
 
 server.listen(server.get('port'), function () {
     console.log('server running', server.get('port'));
