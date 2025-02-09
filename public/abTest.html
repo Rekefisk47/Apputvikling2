@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AB testing</title>
+    <style>
+        * {
+            all: unser;
+            display: revert;
+        }
+        button {
+            padding: 15px;
+            border-radius: 20px;
+            border: none;
+            cursor: pointer;
+            width: 200px;
+        }  
+        button:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+    <div>
+        <h1 id="header">VARIANT</h1>
+        <button id="btn">Click this! </button>
+        <p id="printToken">Token: </p>
+    </div>
+
+    <script>
+        const header = document.getElementById("header");
+        const button = document.getElementById("btn");
+        const printToken = document.getElementById("printToken");
+
+        button.addEventListener('click', function(evt) {
+            console.log("click");
+        });
+        
+        async function getVariant() {
+            let response = await fetch('/get_cookie');
+            let data = await response.json();
+            let variant = data.variant;
+            return variant;
+        }
+
+        async function getToken(){
+            let response = await fetch('/get_cookie');
+            let data = await response.json();
+            let token = data.token;
+            return token;
+        }
+    
+        async function applyVariant() {
+            const variant = await getVariant() || "No variant";
+            const token = await getToken();
+
+            header.innerHTML += " ";
+            header.innerHTML += variant; 
+            printToken.innerHTML += token;
+
+            if(variant == "A"){
+                btn.style.backgroundColor = "pink";
+                btn.style.fontFamily = 'Times New Roman';
+            }else if(variant == "B"){
+                btn.style.backgroundColor = "orange";
+                btn.style.fontFamily = 'Verdana, Geneva';
+            }else{
+                btn.style.backgroundColor = "grey";
+            }
+        }
+
+        applyVariant();
+
+    </script>
+</body>
+</html>
