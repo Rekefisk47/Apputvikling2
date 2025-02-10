@@ -46,6 +46,3 @@ function getRandomVariant(){
     const randomVariant = variants[Math.floor(Math.random() * variants.length)];
     return randomVariant;
 }
-
-
-

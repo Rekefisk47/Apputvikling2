@@ -15,6 +15,11 @@ import path from 'path';
 import log from './modules/log.mjs';
 import { LOGG_LEVELS, eventLogger } from './modules/log.mjs';
 import { storeSession, cookies, abTesting } from './modules/session.mjs';
+//Uke 6
+import { startSession, updateSession } from './modules/session2.mjs';
+import treeRouter from './routes/treeAPI.mjs';
+import questLogRouter from './routes/questLogAPI.mjs';
+import userRouter from './routes/userAPI.mjs';
 //----------------------------------------
 const ENABLE_LOGGING = false;
 
@@ -28,10 +33,16 @@ const abTestingOn = abTesting(true);
 //----------------------------------------
 server.set('port', port);
 server.use(logger);
+server.use(startSession);
 server.use(express.static('public'));
 server.use(express.json());
-
+//Uke 5
 server.use(storeSession);
+//Uke 6
+server.use("/tree/", treeRouter);
+server.use("/quest", questLogRouter);
+server.use("/user", userRouter)
+server.use(updateSession);
 //----------------------------------------
  
 server.get("/", (req, res, next) => {
@@ -122,3 +133,6 @@ server.get("/get_cookie", (req, res, next) => {
 server.listen(server.get('port'), function () {
     console.log('server running', server.get('port'));
 });
+
+
+export default server;
