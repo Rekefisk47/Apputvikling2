@@ -21,20 +21,42 @@
     <button id="shuffleBtn">Shuffle deck</button>
     <button id="drawBtn">Draw a card</button>
     <button id="getBtn">Get deck</button>
+    <button id="deleteLogBtn">Delete deck log</button>
     <br><br>
     <div id="container"></div>
-
+    <div id="deckLogWrapper">
+        <h3>Deck log:</h3>
+        <div id="deckLogContainer"></div>
+    </div>
+    
     <script>
         const textInput = document.getElementById("textInput");
         const createBtn = document.getElementById("createBtn");
         const shuffleBtn = document.getElementById("shuffleBtn");
         const drawBtn = document.getElementById("drawBtn");
         const getBtn = document.getElementById("getBtn");
-        const container = document.getElementById("container");
+        const deleteLogBtn = document.getElementById("deleteLogBtn");
 
-        createBtn.addEventListener('click', evt => {
+        const container = document.getElementById("container");
+        const deckLogContainer = document.getElementById("deckLogContainer");
+
+//--------------------------------------------------------------------------------------//
+
+        let deck_id;
+        let input;
+        let deckLog = getDeckLog();
+        showDeckLog();
+
+//--------------------------------------------------------------------------------------//
+
+        createBtn.addEventListener('click', async evt => {
             container.innerHTML = "";
-            createDeck();
+            const newDeck = await createDeck();
+            deck_id = newDeck.deck_id;
+            //
+            deckLog.unshift(deck_id);
+            deckLogContainer.innerHTML = deck_id + "<br>" + deckLogContainer.innerHTML;
+            localStorage.setItem("allDecks", JSON.stringify(deckLog));
         });
         shuffleBtn.addEventListener('click', evt => {
             shuffleDeck();
@@ -43,13 +65,20 @@
             const card = await drawCard();
             container.innerHTML = `${card.value} ${card.suit}`;
         });
-        getBtn.addEventListener('click', evt => {
-            getDeck();
+        getBtn.addEventListener('click', async evt => {
+            activeDeck.innerHTML = "";
+            const deck = await getDeck();
+            activeDeck.innerHTML += deck.deck_id;
+            console.log("GET DECK: ", deck.deck_id);
+        });
+        deleteLogBtn.addEventListener('click', async evt => {
+            localStorage.removeItem("allDecks");
+            deckLogContainer.innerHTML = "";
+            deckLog = [];
         });
 
-        let deck_id;
-        let input;
-
+//--------------------------------------------------------------------------------------//
+       
         function cangeInput(){
             input = textInput.value;
         }
@@ -57,6 +86,16 @@
             input = textInput.value;
         }
 
+        function getDeckLog(){
+            return JSON.parse(localStorage.getItem("allDecks")) || [];
+        }
+        function showDeckLog(){
+            deckLog.forEach(element => {
+                deckLogContainer.innerHTML += element + "<br>";
+            });
+        }
+
+//--------------------------------------------------------------------------------------//
         async function createDeck() {
             config = {
                 method: "POST",
@@ -66,8 +105,9 @@
             }
             const response = await fetch("/temp/deck", config);
             const data = await response.json();
-            console.log(data);
-            deck_id = data.deck_id;
+            //console.log("response: " , data);
+            //deck_id = data.deck_id;
+            return data;
         } 
 
         async function shuffleDeck() {
@@ -95,7 +135,7 @@
                 response = await fetch(`/temp/deck/${deck_id}/card`);
             }
             const data = await response.json();
-            console.log(data);
+            console.log("DRAW CARD: ", data);
             return data;
         }
 
@@ -107,27 +147,10 @@
                 response = await fetch(`/temp/deck/${deck_id}`);
             }
             const data = await response.json();
-            console.log(data);
+            return data;
         } 
+//--------------------------------------------------------------------------------------//
 
-
-
-
-        /*
-        fetch("/temp/deck", {
-            method: "POST",
-            headeres: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                "deck_id": 1,
-            })
-        }).then(res => {
-            return  res.json();
-        })
-        .then(data => console.log(data))
-        .catch(error => console.log("Error"))
-        */
     </script>
 </body>
 
