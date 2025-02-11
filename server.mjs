@@ -53,7 +53,7 @@ server.get("/", (req, res, next) => {
 //---------------------------------------Uke-3---------------------------------------//
 
 server.get("/tmp/poem", (req, res, next) => {
-    res.status(HTTP_CODES.SUCCESS.OK).send(poem + "<br><br>" + translate[req.language].poem).end();
+    res.status(HTTP_CODES.SUCCESS.OK).send(poem).end();
 });
 
 server.get("/tmp/quote", (req, res, next) => {
@@ -64,7 +64,11 @@ server.post("/tmp/sum/:a/:b", (req, res, next) => {
     const a = req.params.a;
     const b = req.params.b;
     const sum = calculateSum(a,b);
-    res.status(HTTP_CODES.SUCCESS.OK).send({ sum }).end();
+    if(sum){
+        res.status(HTTP_CODES.SUCCESS.OK).send({ sum }).end();
+    }else{
+        res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("Not a number").end();
+    }
 });
 
 //---------------------------------------Uke-3-END-----------------------------------//
