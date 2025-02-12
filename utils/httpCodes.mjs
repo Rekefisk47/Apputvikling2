@@ -6,8 +6,16 @@ const HTTP_CODES = {
         OK: 200
     },
     CLIENT_ERROR: {
-        NOT_FOUND: 404
-    }
+        BAD_REQUEST: 400,
+        UNAUTHORIZED: 401,
+        NOT_FOUND: 404,
+        IM_A_TEAPOT: 418
+    },
+    SERVER_ERROR: {
+        INTERNAL_SERVER_ERROR: 500,
+        NOT_IMPLEMENTED: 501,
+        SERVICE_UNAVAILABLE: 503
+    },
 }
 
 export default HTTP_CODES;
