@@ -75,7 +75,7 @@ server.post("/tmp/sum/:a/:b", (req, res, next) => {
 
 //---------------------------------------Uke-4---------------------------------------//
 
-const decks = [];
+let decks = [];
 let lastDeckCreated;
 
 server.post("/temp/deck", async (req, res, next) => {
@@ -83,6 +83,16 @@ server.post("/temp/deck", async (req, res, next) => {
     res.status(HTTP_CODES.SUCCESS.OK).send(createDeck(uuid)).end();
     decks.push(createDeck(uuid));
     lastDeckCreated = createDeck(uuid).deck_id;
+    console.log(decks);
+});
+
+server.get("/temp/deck/get_all", (req, res, next) => {
+    res.status(HTTP_CODES.SUCCESS.OK).send(decks).end();
+});
+
+server.delete("/temp/deck/delete_all", (req, res, next) => {
+    decks = [];
+    res.status(HTTP_CODES.SUCCESS.OK).send({ message: "Deleted all decks succsessfully."}).end();
 });
 
 server.patch("/temp/deck/shuffle/:deck_id", (req, res, next) => {
