@@ -9,7 +9,7 @@ import { createDeck } from "./temp/deck.mjs";
 import { getDeck } from "./temp/deck.mjs";
 import { shuffleDeck } from "./temp/deck.mjs";
 import { drawCard } from "./temp/deck.mjs";
-import crypto from 'crypto';
+import crypto, { hash } from 'crypto';
 //Uke 5
 import path from 'path';
 import log from './modules/log.mjs';
@@ -20,6 +20,8 @@ import { startSession, updateSession } from './modules/session2.mjs';
 import treeRouter from './routes/treeAPI.mjs';
 import questLogRouter from './routes/questLogAPI.mjs';
 import userRouter from './routes/userAPI.mjs';
+//Uke 8
+import hashmapRouter from './routes/hashmapAPI.mjs';
 //----------------------------------------
 const ENABLE_LOGGING = false;
 
@@ -43,6 +45,8 @@ server.use("/tree/", treeRouter);
 server.use("/quest", questLogRouter);
 server.use("/user", userRouter)
 server.use(updateSession);
+//Uke 8
+server.use("/hashmap", hashmapRouter);
 //----------------------------------------
  
 server.get("/", (req, res, next) => {
