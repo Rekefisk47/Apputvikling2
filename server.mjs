@@ -3,11 +3,7 @@ import HTTP_CODES from './utils/httpCodes.mjs';
 //Uke 3
 import uke3_Router from './routes/uke3API.mjs';
 //Uke 4
-import { createDeck } from "./temp/deck.mjs";
-import { getDeck } from "./temp/deck.mjs";
-import { shuffleDeck } from "./temp/deck.mjs";
-import { drawCard } from "./temp/deck.mjs";
-import crypto from 'crypto';
+import deckRouter from './routes/deckAPI.mjs';
 //Uke 5
 import path from 'path';
 import log from './modules/log.mjs';
@@ -38,6 +34,8 @@ server.use(express.static('public'));
 server.use(express.json());
 //Uke 3
 server.use("/tmp", uke3_Router);
+//Uke 4
+server.use("/temp/deck", deckRouter);
 //Uke 5
 server.use(storeSession);
 //Uke 6
@@ -53,63 +51,6 @@ server.get("/", (req, res, next) => {
     eventLogger("Noen spurte etter root");
     res.status(HTTP_CODES.SUCCESS.OK).send(`Hello World`).end();
 });
-
-//---------------------------------------Uke-4---------------------------------------//
-
-let decks = [];
-let lastDeckCreated;
-
-server.post("/temp/deck", async (req, res, next) => {
-    const uuid = crypto.randomUUID();
-    res.status(HTTP_CODES.SUCCESS.OK).send(createDeck(uuid)).end();
-    decks.push(createDeck(uuid));
-    lastDeckCreated = createDeck(uuid).deck_id;
-    console.log(decks);
-});
-
-server.get("/temp/deck/get_all", (req, res, next) => {
-    res.status(HTTP_CODES.SUCCESS.OK).send(decks).end();
-});
-
-server.delete("/temp/deck/delete_all", (req, res, next) => {
-    decks = [];
-    res.status(HTTP_CODES.SUCCESS.OK).send({ message: "Deleted all decks succsessfully."}).end();
-});
-
-server.patch("/temp/deck/shuffle/:deck_id", (req, res, next) => {
-    const deck = getDeck(req.params.deck_id, decks) || getDeck(lastDeckCreated, decks);
-    console.log("deck = " + decks.length);
-    if(deck != undefined){
-        res.status(HTTP_CODES.SUCCESS.OK).send(deck).end();
-        shuffleDeck(deck);
-    }else{
-        res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No deck found").end();
-    }
-});
-
-server.get("/temp/deck/:deck_id", (req, res, next) => {
-    const deck = getDeck(req.params.deck_id, decks) || getDeck(lastDeckCreated, decks);
-    if(deck != undefined){
-        res.status(HTTP_CODES.SUCCESS.OK).send(deck).end();
-    }else{
-        res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No deck found").end();
-    }
-});
-
-server.get("/temp/deck/:deck_id/card", (req, res, next) => {
-    const deck = getDeck(req.params.deck_id, decks) || getDeck(lastDeckCreated, decks);
-    if(deck != undefined){
-        if(deck.deck.length == 0){
-            res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No more cards left in deck!").end();
-        }else{
-            res.status(HTTP_CODES.SUCCESS.OK).send(drawCard(deck)).end();
-        }
-    }else{
-        res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("No deck found").end();
-    }
-});
-
-//---------------------------------------Uke-4-END-----------------------------------//
 
 //---------------------------------------Uke-5---------------------------------------//
 
