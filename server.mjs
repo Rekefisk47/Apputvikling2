@@ -1,15 +1,13 @@
 import express from 'express'
 import HTTP_CODES from './utils/httpCodes.mjs';
 //Uke 3
-import poem from "./tmp/poem.mjs";
-import { randomQuote } from "./tmp/quote.mjs";
-import { calculateSum } from './tmp/sum.mjs';
+import uke3_Router from './routes/uke3API.mjs';
 //Uke 4
 import { createDeck } from "./temp/deck.mjs";
 import { getDeck } from "./temp/deck.mjs";
 import { shuffleDeck } from "./temp/deck.mjs";
 import { drawCard } from "./temp/deck.mjs";
-import crypto, { hash } from 'crypto';
+import crypto from 'crypto';
 //Uke 5
 import path from 'path';
 import log from './modules/log.mjs';
@@ -38,6 +36,8 @@ server.use(logger);
 server.use(startSession);
 server.use(express.static('public'));
 server.use(express.json());
+//Uke 3
+server.use("/tmp", uke3_Router);
 //Uke 5
 server.use(storeSession);
 //Uke 6
@@ -53,29 +53,6 @@ server.get("/", (req, res, next) => {
     eventLogger("Noen spurte etter root");
     res.status(HTTP_CODES.SUCCESS.OK).send(`Hello World`).end();
 });
-
-//---------------------------------------Uke-3---------------------------------------//
-
-server.get("/tmp/poem", (req, res, next) => {
-    res.status(HTTP_CODES.SUCCESS.OK).send(poem).end();
-});
-
-server.get("/tmp/quote", (req, res, next) => {
-    res.status(HTTP_CODES.SUCCESS.OK).send(randomQuote()).end();
-});
-
-server.post("/tmp/sum/:a/:b", (req, res, next) => {
-    const a = req.params.a;
-    const b = req.params.b;
-    const sum = calculateSum(a,b);
-    if(sum){
-        res.status(HTTP_CODES.SUCCESS.OK).send({ sum }).end();
-    }else{
-        res.status(HTTP_CODES.CLIENT_ERROR.NOT_FOUND).send("Not a number").end();
-    }
-});
-
-//---------------------------------------Uke-3-END-----------------------------------//
 
 //---------------------------------------Uke-4---------------------------------------//
 
