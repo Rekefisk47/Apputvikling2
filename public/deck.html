@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo</title>
+    <link href="css/deck_style.css" rel="stylesheet">
+</head>
+
+<body>
+    <h1>Deck of Cards</h1>
+    <p>- Bug: Shows last card drawn if resetting server after drawing card.</p>
+    <input id="textInput" type="text" placeholder="Deck ID" onchange="cangeInput();">
+    <br><br>
+    <button id="createBtn">Create deck</button>
+    <button id="shuffleBtn">Shuffle deck</button>
+    <button id="drawBtn">Draw a card</button>
+    <button id="getBtn">Get deck</button>
+    <button id="deleteLogBtn">Delete deck log</button>
+    <br>
+    
+    <div id="activeDeckWrapper" class="wrapper">
+        <h3>Active deck:</h3>
+        <div id="activeDeckContainer"></div>
+    </div>
+    <hr>
+        <br>
+            <div id="container2"></div>
+            <div id="container"></div>
+        <br>
+    <hr>
+    <div id="deckLogWrapper" class="wrapper">
+        <h3>Deck log:</h3>
+        <p>OBS: Deleting log affect decks on server!</p>
+        <div id="deckLogContainer"></div>
+    </div>
+    
+    <script>
+        const textInput = document.getElementById("textInput");
+        const createBtn = document.getElementById("createBtn");
+        const shuffleBtn = document.getElementById("shuffleBtn");
+        const drawBtn = document.getElementById("drawBtn");
+        const getBtn = document.getElementById("getBtn");
+        const deleteLogBtn = document.getElementById("deleteLogBtn");
+
+        const activeDeckContainer = document.getElementById("activeDeckContainer");
+        const container2 = document.getElementById("container2");
+        const container = document.getElementById("container");
+        const deckLogContainer = document.getElementById("deckLogContainer");
+
+//--------------------------------------------------------------------------------------//
+//global variables 
+        let latestDeck; //latest deck created 
+        let input; //input from text input field or latest deck   
+//startup code
+        drawDeckLog();
+        let lastCard = JSON.parse(localStorage.getItem("lastCard")) || null;
+//--------------------------------------------------------------------------------------//
+//event listeners
+        createBtn.addEventListener('click', async evt => {
+            localStorage.removeItem("lastCard");
+            textInput.value = "";
+            
+            const newDeck = await createDeck();
+            latestDeck = newDeck; 
+            input = newDeck.deck_id;
+
+            drawDeckLog();//update log
+            showActiveDeck();//show id
+            drawCards(latestDeck);//show visual deck
+            
+            container2.innerHTML = "";//reset drawn card
+        });
+        shuffleBtn.addEventListener('click', async evt => {
+            await shuffleDeck();
+            drawShuffledCards();
+        });
+
+        drawBtn.addEventListener('click', async evt => {
+            const card = await drawCard();
+            if(input && card){//if there as an active deck and a card
+                const deck = await drawActiveDeck();
+                drawDrawnCard(card);
+            }else if(input){ //if no more cards or no active deck
+                drawNoMoreCards();
+            }else{ 
+                drawNoActiveDeck();
+            }
+        });
+        
+        getBtn.addEventListener('click', async evt => {
+            if(input){
+                const deck = await drawActiveDeck();
+                console.log("GET DECK: ", deck, deck.deck.length);
+            }else{
+                drawNoActiveDeck();
+            }
+        });
+
+        deleteLogBtn.addEventListener('click', evt => {
+            //reset global variables 
+            input = null;
+            latestDeck = "";
+            //reset card UI
+            container.innerHTML = "";//reset cards
+            deckLogContainer.innerHTML = "";//reset log
+            container2.innerHTML = "";
+            //delete from server
+            deleteAllDecks();
+            //reset active deck UI
+            showActiveDeck();
+            //delete from local storage
+            localStorage.removeItem("lastCard");
+        });
+
+//--------------------------------------------------------------------------------------//
+//general functions 
+        window.onload = async function(){
+            latestDeck = await getLastDeckCreated();//sets latestDeck to be latest deck created
+            input = textInput.value || latestDeck.deck_id; //input = the value in the input field or the latest deck id
+            showActiveDeck();//sets input. if input is valid, show the id
+            if(input){ //draw cards in deck that is taken from the active deck which is the input
+                drawCards(await getDeck());
+            }
+            if(lastCard){
+                container2.innerHTML = `${lastCard.value} ${lastCard.suit} <hr>`;
+            }
+        }
+      
+        async function cangeInput(){
+            input = textInput.value;
+            showActiveDeck();//change active deck
+            if(input){
+                drawCards(await getDeck());//redraw cards
+            }
+            container2.innerHTML = "";
+        }
+
+        async function drawDeckLog(){
+            let allDecks = await getAllDecks();
+            deckLogContainer.innerHTML = "";
+            allDecks.forEach(deck => {
+                let p = document.createElement("p");
+                p.innerText = deck.deck_id;
+                deckLogContainer.prepend(p); 
+            });
+        }
+
+        async function showActiveDeck(){
+            let inputTrue = await checkIfValidInput(input); //checks if input is true or false      
+            if(inputTrue){
+                activeDeckContainer.innerHTML = input; //if mactch show that
+            }else{
+                activeDeckContainer.innerHTML = latestDeck.deck_id || "No active deck";
+                textInput.value = "";
+            }
+        }
+
+        async function getLastDeckCreated(){
+            let allDecks = await getAllDecks();
+            if(allDecks.length > 0){
+                return allDecks[allDecks.length-1];
+            }else{
+                return [];
+            }
+        }
+
+        async function drawShuffledCards(){
+            if(input){
+                const deck = await drawActiveDeck();
+                if(deck.deck.length == 0){
+                    drawNoMoreCards();
+                }
+            }else{
+                drawNoActiveDeck();
+            }
+        }
+
+        function drawNoMoreCards(){
+            container2.innerHTML = "";
+            let p = document.createElement("p");
+            p.innerText = "NO MORE CARDS";
+            container2.appendChild(p); 
+            localStorage.removeItem("lastCard");
+        }
+
+        function drawDrawnCard(_card){
+            let card = _card;
+            container2.innerHTML = `${card.value} ${card.suit} <hr>`;
+            lastCard = card;
+            localStorage.setItem("lastCard", JSON.stringify(lastCard));
+        }
+
+        async function drawActiveDeck(){
+            const deck = await getDeck();
+            drawCards(deck);
+            return deck;
+        }
+
+        function drawNoActiveDeck(){
+            container2.innerHTML = "";
+            let p = document.createElement("p");
+            p.innerText = "NO ACTIVE DECK";
+            container2.appendChild(p);
+        }
+
+        async function checkIfValidInput(_input){
+            let input = _input;
+            let allDecks = await getAllDecks();
+            for (let deck of allDecks) {
+                if (deck.deck_id == _input) {
+                    return true; 
+                }
+            }
+            return false;
+        }
+
+        function drawCards(_deck){
+            container.innerHTML = "";
+            let deck = _deck;
+            if(deck){
+                deck.deck.forEach(card => {
+                    let cardElement = document.createElement("div");
+                    cardElement.classList.add("card");
+                    
+                    if(card.suit === "hearts") {
+                        cardElement.classList.add("red");
+                        cardElement.innerText = `${card.value} \n ♡`;
+                    }else if(card.suit === "diamonds"){
+                        cardElement.classList.add("red");
+                        cardElement.innerText = `${card.value} \n ♢`;
+                    }else if(card.suit === "spades"){
+                        cardElement.classList.add("black");
+                        cardElement.innerText = `${card.value} \n ♤`;
+                    }else if(card.suit === "clubs"){
+                        cardElement.classList.add("black");
+                        cardElement.innerText = `${card.value} \n ♧`;
+                    }
+
+                    container.appendChild(cardElement);
+                });
+            }
+        }
+
+//--------------------------------------------------------------------------------------//
+//fetch requests
+        async function createDeck() {
+            config = {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+            const response = await fetch("/temp/deck", config);
+            const data = await response.json();
+            return data;
+        } 
+
+        async function shuffleDeck() {
+            config = {
+                method: "PATCH",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+            try {
+                let response = await fetch(`/temp/deck/shuffle/${input}`, config);
+                if (!response.ok) {
+                    throw new Error(response.status);
+                }
+                const data = await response.json();
+                console.log(data);
+                return data;
+            }catch (error){
+                console.log(error + " - Couldn't find deck to shuffle");
+            }
+        }
+
+        async function drawCard() {
+            try{
+                let response = await fetch(`/temp/deck/${input}/card`);
+                if (!response.ok) {
+                    throw new Error(response.status);
+                }
+                const data = await response.json();
+                return data;
+            }catch (error){
+                console.log(error + " - Couldn't find deck to draw from");
+            }
+        }
+
+        async function getDeck() {
+            try{
+                let response = await fetch(`/temp/deck/${input}`);
+                if (!response.ok) {
+                    throw new Error(response.status);
+                }
+                const data = await response.json();
+                return data;
+            }catch (error){
+                console.log(error + " - Couldn't find deck get");
+            }
+        } 
+
+        async function getAllDecks() {
+            try{
+                const response = await fetch(`/temp/deck/get_all`); 
+                if (!response.ok) {
+                    throw new Error(response.status);
+                }
+                const data = await response.json();
+                return data;
+            }catch (error){
+                console.log(error + " - Couldn't get all decks");
+                return [];
+            }
+        } 
+
+        async function deleteAllDecks() {
+            config = {
+                method: "DELETE",
+            }
+            try{
+                const response = await fetch(`/temp/deck/delete_all`, config);
+                if (!response.ok) {
+                    throw new Error(response.status);
+                }
+                const data = await response.json();
+            }catch{
+                console.log(error + " - Couldn't delete all decks");
+            }
+        } 
+//--------------------------------------------------------------------------------------//
+
+    </script>
+</body>
+
+</html>
