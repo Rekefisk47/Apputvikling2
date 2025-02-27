@@ -4,14 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AB testing</title>
+    <link href="css/standar_style.css" rel="stylesheet">
     <style>
-        * {
-            all: unser;
-            display: revert;
-        }
         button {
             padding: 15px;
-            border-radius: 20px;
+            border-radius: 15px;
             border: none;
             cursor: pointer;
             width: 200px;
@@ -19,23 +16,38 @@
         button:active {
             transform: scale(0.98);
         }
+        .wrapper{
+            font-size: 13px;
+        }
+        p {
+            line-height: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <div>
-        <h1 id="header">VARIANT</h1>
-        <button id="btn">Click this! </button>
-        <p id="printToken">Token: </p>
+    <h1 class="type-space type-center color-3">==> AB Testing</h1>
+    
+    <div class="type-center type-space container">
+        <div class="type-center wrapper">
+            <h1 id="header">VARIANT</h1>
+            <button id="btn">Click this! </button>
+            <p id="printToken" style="font-weight:bolder;">Token: </p>
+        </div>
+    </div>
+
+    <div class="type-center-vertical type-center type-space" id="content-container">
+        <div class="type-auto-margin content color-3" id="content"></div>
     </div>
 
     <script>
         const header = document.getElementById("header");
         const button = document.getElementById("btn");
         const printToken = document.getElementById("printToken");
+        const content = document.getElementById("content");
 
         button.addEventListener('click', function(evt) {
-            console.log("click");
+            console.log("This button does abslutely nothing.");
         });
         
         async function getVariant() {
@@ -59,15 +71,20 @@
             header.innerHTML += " ";
             header.innerHTML += variant; 
             printToken.innerHTML += token;
+            
+            let note = document.createElement("p");
+            note.innerHTML = `Hello Experiment #1!<br><br>You have been assigned test group ${variant}.<br>But hush! Don't tell anyone.<br> This is supposed to be a secret so the test results aren't "compromised" or anything.`;
 
             if(variant == "A"){
-                btn.style.backgroundColor = "pink";
+                btn.style.backgroundColor = "#b1eb34";
                 btn.style.fontFamily = 'Times New Roman';
+                content.append(note);
             }else if(variant == "B"){
-                btn.style.backgroundColor = "orange";
+                btn.style.backgroundColor = "#ebbd34";
                 btn.style.fontFamily = 'Verdana, Geneva';
+                content.append(note);
             }else{
-                btn.style.backgroundColor = "grey";
+                btn.style.backgroundColor = "#292929";
             }
         }
 

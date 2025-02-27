@@ -22,12 +22,15 @@
                 <button class="chat-log-button" onclick="toggleChat()" id="chat-btn">Show chat</button>
                 <p class="chat-log type-left" id="chat-log" style="display:none">
         
-                    JustifiedApocalypse <span style="color:#B00B1E">[JA]</span>  began pestering reader <span style="color:#B5AF14">[UR]</span> --
+                    -- MysteriousAuthor <span style="color:#B00B1E">[MA]</span> began pestering UnknownReader <span style="color:#B5AF14">[UR]</span> --
                     <br><br>
-                    <span style="color:#B00B1E">JA: Helloooooo</span><br>
-                    <span style="color:#B5AF14">CG: Helloooooo</span><br>
-                    <span style="color:#B00B1E">JA: Helloooooo</span><br>
-            
+                    <span style="color:#B00B1E">MA: This is a hub for collecting and displaying the past, present and future projects connected to Apputvikling 2.</span><br>
+                    <span style="color:#B5AF14">UR: And this, what is this space?</span><br>
+                    <span style="color:#B00B1E">MA: A conversation of sorts. </span><br>
+                    <span style="color:#B5AF14">UR: What is there to talk about?</span><br>
+                    <span style="color:#B00B1E">MA: We'll see... </span><br>
+                    <span style="color:#B00B1E">MA: It is evolving... </span><br>
+
                 </p>
             </div>
         </div>
@@ -49,7 +52,6 @@
 
     <script>
         const buttons = document.querySelectorAll('.button');
-        console.log(buttons);
 
         buttons.forEach(button => {
             button.addEventListener('click', () => {
@@ -60,8 +62,9 @@
                     //window.location.href = "index.html";
                     window.open("deck.html");
                 }else if(button.id == "middlewearBtn"){
-                    console.log("Be pateient...");
+                    window.open("abTest.html");
                 }else if(button.id == "hashmapBtn"){
+                    //window.open("hashmap.html");
                     console.log("Be pateient...");
                 }else if(button.id == "pwaBtn"){
                     console.log("Be pateient...");
@@ -86,7 +89,6 @@
         let click = false;
         function toggleHelloWorld(){
             const helloWorld = document.getElementById('hello-world');
-            console.log(click);
             if(click == false){
                 click = true;
                 helloWorld.innerText = "Goodbye World";
