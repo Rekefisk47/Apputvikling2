@@ -1,9 +1,5 @@
 import express from 'express'
 import HTTP_CODES from './utils/httpCodes.mjs';
-//Uke 3
-import uke3_Router from './routes/uke3API.mjs';
-//Uke 4
-import deckRouter from './routes/deckAPI.mjs';
 //Uke 5
 import log from './modules/log.mjs';
 import { LOGG_LEVELS, eventLogger } from './modules/log.mjs';
@@ -36,10 +32,6 @@ server.use(startSession);//<-christian sin session
 server.use(storeSession);//<- min session
 server.use(express.static('public'));
 server.use(express.json());
-//Uke 3
-server.use("/tmp", uke3_Router);
-//Uke 4
-server.use("/temp/deck", deckRouter);
 //Uke 5
 server.use("/", abTestRouter);
 //Uke 6
