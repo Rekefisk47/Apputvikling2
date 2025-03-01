@@ -4,7 +4,6 @@ import HTTP_CODES from './utils/httpCodes.mjs';
 import log from './modules/log.mjs';
 import { LOGG_LEVELS, eventLogger } from './modules/log.mjs';
 //Uke 6
-import { startSession, updateSession } from './modules/session2.mjs';
 import userRouter from './routes/userAPI.mjs';
 //Uke 8
 import hashmapRouter from './routes/hashmapAPI.mjs';
@@ -20,12 +19,10 @@ const logger = log(LOGG_LEVELS.VERBOSE);
 //----------------------------------------
 server.set('port', port);
 server.use(logger);
-server.use(startSession);//<-christian sin session
 server.use(express.static('public'));
 server.use(express.json());
 //Uke 6
 server.use("/user", userRouter)
-server.use(updateSession);
 //Uke 8
 server.use("/hashmap", hashmapRouter);
 //----------------------------------------//
