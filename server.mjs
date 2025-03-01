@@ -8,7 +8,6 @@ import abTestRouter from './routes/abTestAPI.mjs';
 //Uke 6
 import { startSession, updateSession } from './modules/session2.mjs';
 import treeRouter from './routes/treeAPI.mjs';
-import questLogRouter from './routes/questLogAPI.mjs';
 import userRouter from './routes/userAPI.mjs';
 //Uke 8
 import hashmapRouter from './routes/hashmapAPI.mjs';
