@@ -7,7 +7,6 @@ import { storeSession, abTesting } from './modules/session.mjs';
 import abTestRouter from './routes/abTestAPI.mjs';
 //Uke 6
 import { startSession, updateSession } from './modules/session2.mjs';
-import treeRouter from './routes/treeAPI.mjs';
 import userRouter from './routes/userAPI.mjs';
 //Uke 8
 import hashmapRouter from './routes/hashmapAPI.mjs';
@@ -34,8 +33,6 @@ server.use(express.json());
 //Uke 5
 server.use("/", abTestRouter);
 //Uke 6
-server.use("/tree/", treeRouter);
-server.use("/quest", questLogRouter);
 server.use("/user", userRouter)
 server.use(updateSession);
 //Uke 8
