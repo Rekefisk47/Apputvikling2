@@ -1,11 +1,11 @@
+
 const cacheID = "sienceV2";
 const contentToCache = [
     "/index.html",
     "/app.mjs",
-    "/icons/dragon.png",
-    "/icons/dragonLarge.png",
-    "/css/style.css",
-    "/API/knowledgeGraph"
+    "/icons/bookshelf.png",
+    "/icons/bookshelfLarge.png",
+    "/css/index.css",
 ];
 
 self.addEventListener('install', (e) => {
@@ -30,7 +30,7 @@ self.addEventListener('fetch', (e) => {
         console.log(`[Service Worker] Fetching resource: ${e.request.url}`);
         if (r) { return r };
         const response = await fetch(e.request);
-        const cache = await caches.open(cacheName);
+        const cache = await caches.open(cacheID);
         console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
         cache.put(e.request, response.clone());
         return response;

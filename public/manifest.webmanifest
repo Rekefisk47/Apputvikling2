@@ -1,18 +1,19 @@
 {
-    "name": "Sience app",
+    "name": "Lookie Lookie at my Bookie",
+    "short_name": "LLamB",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#f0f0f0",
+    "background_color": "#ffffff",
     "icons": [
         {
-            "src": "icons/dragon.png",
+            "src": "icons/bookshelf.png",
             "type": "image/png",
-            "sizes": "128x128"
+            "sizes": "150x150"
         },
         {
-            "src": "icons/dragonLarge.png",
+            "src": "icons/bookshelfLarge.png",
             "type": "image/png",
-            "sizes": "512x512"
+            "sizes": "600x600"
         }
     ]
 }
