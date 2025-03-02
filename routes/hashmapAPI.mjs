@@ -1,36 +1,44 @@
 import express from "express";
 import HTTP_CODES from "../utils/httpCodes.mjs";
-import { myMap } from "../data/hashmap.mjs";
+import { hashMap } from "../data/hashmap.mjs";
+import createWorkID from "../modules/work-id-generator.mjs";
 const hashmapRouter = express.Router();
 
-const myHashmap = myMap;
+const myHashmap = hashMap;
 
 hashmapRouter.use(express.json());
-//get all
-hashmapRouter.get("/items", (req, res, next) => {
-    res.send(myHashmap.getAllItems());
-});
-//get specific 
-hashmapRouter.get("/item/", (req, res, next) => {
-    const key = req.query.key;
-    console.log(req.query.key);
-    res.json({ "key" : key, "value" : myHashmap.getItem(key)});
+
+hashmapRouter.get("/:work_id", (req, res, next) => {
+    const key = "work" + req.params.work_id;
+    res.json(myHashmap.get(key));
 });
 
 hashmapRouter.post("/", (req, res, next) => {
-    const { key, value } = req.query;
-    myHashmap.setItem(key, value);
-    res.json({ key, value });
+    console.log("------");
+    console.log(req.body);
+    console.log("------");
+
+    const bodyData = req.body;
+    const value = bodyData;
+
+    const work_id = createWorkID(); //creates a new work with an interger ID
+    const key = "work" + work_id;
+    
+    res.status(HTTP_CODES.SUCCESS.OK).json(myHashmap.set(key, value)).end();
 });
 
-hashmapRouter.put("/", (req, res, next) => {
-    res.status(HTTP_CODES.SERVER_ERROR.NOT_IMPLEMENTED).send("Nothing here yet...").end();
+hashmapRouter.put("/:work_id", (req, res, next) => {
+    const bodyData = req.body;
+    const value = bodyData;
+
+    const key = "work" + req.params.work_id;
+
+    res.status(HTTP_CODES.SUCCESS.OK).json(myHashmap.update(key, value)).end();
 });
 
-hashmapRouter.delete("/", (req, res, next) => {
-    const key = req.query.key;
-    myHashmap.removeItem(key);
-    res.send("Deleted: " + key);
+hashmapRouter.delete("/:work_id", (req, res, next) => {
+    const key = "work" + req.params.work_id;
+    res.status(HTTP_CODES.SUCCESS.OK).json(myHashmap.remove(key)).end();
 });
 
 export default hashmapRouter;
