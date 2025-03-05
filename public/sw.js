@@ -6,6 +6,22 @@ const contentToCache = [
     "/icons/bookshelf.png",
     "/icons/bookshelfLarge.png",
     "/css/index.css",
+
+    "/modules/formData-to-object.mjs",
+    "/modules/load-views.mjs",
+
+    "/templates/add-work-template.html",
+    "/templates/browse-works-template.html",
+    "/templates/create-user-template.html",
+    "/templates/header-template.html",
+    "/templates/home-template.html",
+    "/templates/login-user-template.html",
+
+    "/views/add-work.mjs",
+    "/views/create-user.mjs",
+    "/views/header.mjs",
+    "/views/home.mjs",
+    "/views/login-user.mjs",
 ];
 
 self.addEventListener('install', (e) => {
