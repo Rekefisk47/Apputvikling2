@@ -5,8 +5,7 @@
 export function formDataToObject(formData){
     const formDataObj = {};
     formData.forEach((value, key) => {
-        if (formDataObj[key]) {
-            console.log(formDataObj[key], value);
+        if (formDataObj[key] && !formDataObj[key].includes(value)) { //if already exists
             formDataObj[key] = [].concat(formDataObj[key], value);
         } else {
             formDataObj[key] = value;
