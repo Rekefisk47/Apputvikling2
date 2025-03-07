@@ -1,16 +1,17 @@
 
 <template>
     <div>
-        <formData id="create-user-form">
+        <form id="create-user-form">
             <fieldset>
                 <legend>Create user:</legend><br>
 
-                <input type="text" name="username" placeholder="Username" autocomplete="off" required><br>
+                <input type="text" name="username" placeholder="Username" maxlength="20" autocomplete="off" required><br>
                 <input type="password" name="password" placeholder="Password" autocomplete="off" required><br>
-                
-                <input id="submit-create-user-btn" type="submit" value="Create user">
         
+                <input id="submit-create-user-btn" type="submit" value="Create user">
+                <p>Already had a user? <a href="#" id="login-user-link">Back to login</a></p>
+
             </fieldset>
-        </formData>
+        </form>
     </div>
 </template>
