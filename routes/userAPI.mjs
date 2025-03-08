@@ -1,15 +1,18 @@
 import express from "express";
 import { userMap } from "../data/hashmap.mjs";
+import { userWorkMap } from "../data/hashmap.mjs";
 import HTTP_CODES from "../utils/httpCodes.mjs";
 import { validateUsername } from "../modules/validate-username.mjs";
 import { passHash, verifyPassHash } from "../modules/password-hash.mjs";
 import { authenticateToken, generateAndSetCookie } from "../modules/token.mjs";
+import { createUserID } from "../modules/work-id-generator.mjs";
 
 const userRouter = express.Router();
 
 userRouter.use(express.json());
 
 const myUserMap = userMap;
+const myUserWorkMap = userWorkMap;
 
 userRouter.get("/get", (req, res, next) => {
     const value = req.body.username; 
@@ -26,7 +29,7 @@ userRouter.get("/profile", authenticateToken, (req, res, next) => {
     const loggedInUser = req.user.username; 
     const key = loggedInUser.toLowerCase();
     try{
-        res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message: "HERE U GO", user :  userMap.get(key)});
+        res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message: "HERE U GO", user :  userMap.get(key), works: myUserWorkMap.get(key) });
     }catch(error){ 
         res.status(HTTP_CODES.SERVER_ERROR.INTERNAL_SERVER_ERROR).json({ status: false, message: "Couldn't find your profile?."});
     }
@@ -35,7 +38,7 @@ userRouter.get("/profile", authenticateToken, (req, res, next) => {
 userRouter.post("/create", passHash, validateUsername, (req, res, next) => {
     const value = req.body;
     const key = value.username.toLowerCase();
-
+  
     //validate username
     if(!req.body.username){
         return res.status(HTTP_CODES.CLIENT_ERROR.BAD_REQUEST).json({ status: false, message: 'Valid username is required' });
@@ -44,6 +47,8 @@ userRouter.post("/create", passHash, validateUsername, (req, res, next) => {
     if(myUserMap.get(key)){
         return res.status(HTTP_CODES.CLIENT_ERROR.BAD_REQUEST).json({ status: false, message: 'Username already exists' });
     }else{
+        //create a user ID
+        value["userId"] = createUserID();
         //add user to datastructure
         myUserMap.set(key, value)
         res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message : "User sucsessfully created!"}).end();

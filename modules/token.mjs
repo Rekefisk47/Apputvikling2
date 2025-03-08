@@ -10,7 +10,7 @@ const secretKey = "secret";
 function generateToken(user) {
     // Payload contains the user information
     const payload = JSON.stringify({
-        userId: user.id,
+        userId: user.userId,
         username: user.username,
         expirationDate: Date.now() + 24 * 60 * 60 * 1000,
     });
@@ -76,7 +76,6 @@ export async function authenticateToken(req, res, next){
         return;
     }
 
-    console.log("AAAA:", base64Payload);
     //checks signature
     const signature = crypto.createHmac('sha256', secretKey).update(base64Payload).digest('base64');
     const webFriendlySignature = base64UrlSignature.replace(/-/g, '+').replace(/_/g, '/');

@@ -1,9 +1,12 @@
 
-let counter = 0;
-
-function createWorkID(){
-    counter ++;
-    return (counter);
+let workCounter = 0;
+export function createWorkID(){
+    workCounter ++;
+    return (workCounter);
 }
 
-export default createWorkID;
+let userCounter = 0;
+export function createUserID(){
+    userCounter ++;
+    return (userCounter);
+}

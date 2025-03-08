@@ -1,4 +1,3 @@
-import createWorkID from "../modules/work-id-generator.mjs";
 
 class Hashmap {
     constructor(tableSize = 16) {
@@ -6,7 +5,7 @@ class Hashmap {
         this.tableSize = tableSize;
     }
  
-    hash(key) {
+    hash(key) { //TODO: add so a single number gets hashes differnlty
         let hashValue = 7;
         for (let i = 0; i < key.length; i++) {
             hashValue = (hashValue + key.charCodeAt(i) * i) % this.tableSize;
@@ -15,6 +14,7 @@ class Hashmap {
     }
 
     set(key, value){
+        console.log("SETT VALUE:", key, value);
         const index = this.hash(key);
 
         if (!this.table[index]) {
@@ -27,9 +27,6 @@ class Hashmap {
             }
         }
         
-        //adds an id value 
-        value["id"] = createWorkID();
-    
         this.table[index].push({ key, value });
 
         return this.table;
