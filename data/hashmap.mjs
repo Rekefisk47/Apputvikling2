@@ -1,3 +1,4 @@
+import createWorkID from "../modules/work-id-generator.mjs";
 
 class Hashmap {
     constructor(tableSize = 16) {
@@ -25,6 +26,9 @@ class Hashmap {
                 return { message: "This key already exists" };
             }
         }
+        
+        //adds an id value 
+        value["id"] = createWorkID();
     
         this.table[index].push({ key, value });
 
@@ -74,12 +78,12 @@ class Hashmap {
         }
         return message;
     }
-
+    
     get(key) {
         const index = this.hash(key);
 
         if (!this.table[index]) {
-            return { message: "No key match to get" };
+            return null;
         }
 
         for (let i = 0; i < this.table[index].length; i++) {
@@ -88,8 +92,25 @@ class Hashmap {
             }
         }
     }
+
+    getAll(){
+        //Creates a list object and returns
+        let list = {};
+        this.table.forEach((bucket, index) => {
+            if (bucket) {
+                bucket.forEach((obj) => {
+                    console.log(obj);
+                    list[obj.value.id] = obj.value;
+                });
+            }
+        });
+        return list;
+        //return this.table;
+    }
 }
 
 const hashMap = new Hashmap();
+const userMap = new Hashmap();
+const userWorkMap = new Hashmap();
 
-export { hashMap };
+export { hashMap, userMap, userWorkMap };
