@@ -3,28 +3,48 @@ import HTTP_CODES from "../utils/httpCodes.mjs";
 import { hashMap } from "../data/hashmap.mjs";
 import createWorkID from "../modules/work-id-generator.mjs";
 const hashmapRouter = express.Router();
+import { authenticateToken } from "../modules/token.mjs";
+
+import { userWorkMap } from "../data/hashmap.mjs";
+let myUserWorkMap = userWorkMap;
 
 const myHashmap = hashMap;
 
 hashmapRouter.use(express.json());
 
-hashmapRouter.get("/:work_id", (req, res, next) => {
-    const key = "work" + req.params.work_id;
+hashmapRouter.get("/:id", (req, res, next) => {
+    const key = req.params.id;
     res.json(myHashmap.get(key));
 });
 
-hashmapRouter.post("/", (req, res, next) => {
-    console.log("------");
-    console.log(req.body);
-    console.log("------");
+hashmapRouter.get("/", async (req, res, next)  => {
+    res.status(HTTP_CODES.SUCCESS.OK).json(myHashmap.getAll());
+});
 
-    const bodyData = req.body;
-    const value = bodyData;
+hashmapRouter.post("/", authenticateToken, (req, res, next) => {
+    let value = req.body;
+    const author = req.user.username;
+    value["author"] = req.user.username;
+    value["authorId"] = req.user.userId;
+    const key = createWorkID(); 
+    myHashmap.set(key, value);
 
-    const work_id = createWorkID(); //creates a new work with an interger ID
-    const key = "work" + work_id;
+    console.log("--------------");
+    console.log(value);
+    console.log("--------------");
+    console.log("Authenticated user:", req.user.username);
+    console.log("Authenticated user:", req.user.userId);
+    console.log("--------------");
+
+    //add to map for easy lookup
+    if (!myUserWorkMap[author]) {
+        myUserWorkMap[author] = [];
+    }
+    myUserWorkMap[author].push(key); 
+    console.log(myUserWorkMap);
+    //---------------------------//
     
-    res.status(HTTP_CODES.SUCCESS.OK).json(myHashmap.set(key, value)).end();
+    res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message: "You have created a beautiful piece of work!"}).end();
 });
 
 hashmapRouter.put("/:work_id", (req, res, next) => {
