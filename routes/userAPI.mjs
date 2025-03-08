@@ -3,7 +3,7 @@ import { userMap } from "../data/hashmap.mjs";
 import HTTP_CODES from "../utils/httpCodes.mjs";
 import { validateUsername } from "../modules/validate-username.mjs";
 import { passHash, verifyPassHash } from "../modules/password-hash.mjs";
-import { generateAndSetCookie } from "../modules/token.mjs";
+import { authenticateToken, generateAndSetCookie } from "../modules/token.mjs";
 
 const userRouter = express.Router();
 
@@ -19,6 +19,16 @@ userRouter.get("/get", (req, res, next) => {
         res.status(HTTP_CODES.SUCCESS.OK).send(myUserMap.get(key)).end();
     }catch(error){
         res.status(HTTP_CODES.SERVER_ERROR.INTERNAL_SERVER_ERROR).json({message: "No match found."});
+    }
+});
+
+userRouter.get("/profile", authenticateToken, (req, res, next) => {
+    const loggedInUser = req.user.username; 
+    const key = loggedInUser.toLowerCase();
+    try{
+        res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message: "HERE U GO", user :  userMap.get(key)});
+    }catch(error){ 
+        res.status(HTTP_CODES.SERVER_ERROR.INTERNAL_SERVER_ERROR).json({ status: false, message: "Couldn't find your profile?."});
     }
 });
 

@@ -57,6 +57,10 @@ export async function getUser() {
     return fetchData("GET", "/user/get");
 }
 
+export async function getUserProfile() {
+    return fetchData("GET", "/user/profile");
+}
+
 export async function changeUser() {
     return fetchData("PUT", "/user/change");
 }

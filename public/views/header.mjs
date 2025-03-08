@@ -1,6 +1,8 @@
 import { placeTemplate } from "../modules/load-templates.mjs";
+import { getUserProfile } from "../modules/fetch-data.mjs";
+import { messagehandler } from "../modules/message-handler.mjs";
 
-export async function init(pageData = null) {
+export function init(pageData = null) {
   
     document.getElementById("homeBtn").addEventListener("click", () => {
         placeTemplate("home-template.html", "home.mjs");
@@ -14,7 +16,12 @@ export async function init(pageData = null) {
     document.getElementById("addBtn").addEventListener("click", () => {
         placeTemplate("add-work-template.html", "add-work.mjs");
     });
-    document.getElementById("profileBtn").addEventListener("click", () => {
-        placeTemplate("profile-template.html", "profile.mjs");
+    document.getElementById("profileBtn").addEventListener("click", async () => {
+        const profile = await getUserProfile();
+        if(!profile.status){
+            messagehandler(profile.message);
+        }else{
+            placeTemplate("profile-template.html", "profile.mjs", profile);
+        }
     });
 }

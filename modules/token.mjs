@@ -59,7 +59,7 @@ export async function authenticateToken(req, res, next){
     const token = await cookieParser(req,res,next);
     
     if(!token){
-        res.status(HTTP_CODES.CLIENT_ERROR.UNAUTHORIZED).json({ message: "You must be logged in to create a work!"});
+        res.status(HTTP_CODES.CLIENT_ERROR.UNAUTHORIZED).json({ status: false, message: "You are not logged in!"});
         return;
     }
 
