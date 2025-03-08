@@ -30,7 +30,7 @@ async function fetchModule(moduleName){
 
 //-------------------------------------------------------//
 
-export async function placeTemplate(templateName, moduleName){
+export async function placeTemplate(templateName, moduleName, pageData = null){
     const templateContainer = document.getElementById("template-container");
 
     //gets and clones header template
@@ -46,19 +46,20 @@ export async function placeTemplate(templateName, moduleName){
     //initiate scripts
     const module = await fetchModule(moduleName);
     if (module && module.init) {
-        module.init();
+        module.init(pageData);
     }
     const headerModule = await fetchModule("header.mjs");
     if (headerModule && headerModule.init) {
         headerModule.init();
     }
     
-    saveTemplateAndModule(templateName, moduleName);
+    saveTemplateModuleData(templateName, moduleName, pageData);
 }
 
-function saveTemplateAndModule(templateName, moduleName){
+function saveTemplateModuleData(templateName, moduleName, pageData = null){
     localStorage.setItem("lastTemplate", templateName);
     localStorage.setItem("lastModule", moduleName);
+    localStorage.setItem("pageData", JSON.stringify(pageData));
 }
 
 //-------------------------------------------------------//
@@ -67,9 +68,10 @@ function saveTemplateAndModule(templateName, moduleName){
 function runTemplates(){
     let latestTemplate = localStorage.getItem("lastTemplate");
     let latestModule = localStorage.getItem("lastModule");
+    let pageData = JSON.parse(localStorage.getItem("pageData"));
     
     if(latestTemplate && latestModule){
-        placeTemplate(latestTemplate, latestModule);
+        placeTemplate(latestTemplate, latestModule, pageData);
     }else{
         placeTemplate("home-template.html", "home.mjs");
     }
