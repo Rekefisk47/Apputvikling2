@@ -61,8 +61,8 @@ export async function getUserProfile() {
     return fetchData("GET", "/user/profile");
 }
 
-export async function changeUser() {
-    return fetchData("PUT", "/user/change");
+export async function changeUser(formDataObj) {
+    return fetchData("PUT", "/user/change", formDataObj);
 }
 
 export async function deleteUser() {

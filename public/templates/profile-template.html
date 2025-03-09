@@ -4,11 +4,24 @@
         <div class="type-center">
         <h1 id="username"></h1>
         <p id="userId"></p>
+        <p id="changeBtn"><a href="#">Change my profile</a></p>
+            <div id="change-user-container" style="display: none">
+                <hr>
+                <form id="change-user-form">
+                    <fieldset>
+                        <legend>Change user:</legend><br>
+        
+                        <input type="text" name="username" placeholder="New username" maxlength="20" autocomplete="off" required><br>
+                        <input type="password" name="password" placeholder="New password" autocomplete="off" required><br>
+                
+                        <input id="submit-change-user-btn" type="submit" value="Change user">    
+                    </fieldset>
+                </form>
+                <br>
+                <button id="delete-user-button" style="padding:1px">Delete user</button>
+            </div>
         </div>
         <hr>
         <h1>Works:</h1>
-
-        <hr>
-        <p>Change user</p>
     </div>
 </template>

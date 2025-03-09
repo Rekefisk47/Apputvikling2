@@ -32,6 +32,7 @@ class Hashmap {
         return this.table;
     }
 
+    //updates value 
     update(key, value){
         const index = this.hash(key);
     
@@ -50,6 +51,59 @@ class Hashmap {
         return { message: "No match to update" };
     }
 
+    //updates key
+    updateKey(oldKey, newKey){
+        const oldIndex = this.hash(oldKey);
+        const newIndex = this.hash(newKey);
+        /*
+        console.log(oldKey, newKey);
+        console.log(oldIndex, newIndex);
+        console.log(this.table);
+        console.log(this.table[oldIndex]);
+        */
+        if (!this.table[oldIndex]) {
+            return { message: "No match to update" };
+        }
+        
+        for (let i = 0; i < this.table[oldIndex].length; i++) {
+            if(this.table[oldIndex][i].key === oldKey){
+
+                //stores the value of entry
+                const removedEntry = this.table[oldIndex].splice(i, 1)[0];
+                
+                //Insert the entry with the new key
+                if (!this.table[newIndex]) {
+                    this.table[newIndex] = [];
+                }
+                removedEntry.key = newKey;
+                removedEntry.value.username = newKey;
+                this.table[newIndex].push(removedEntry);
+
+                //makes empty array null
+                if (this.table[oldIndex].length === 0) {
+                    this.table[oldIndex] = null;
+                }
+
+                return this.table;
+            }
+            /*if (this.table[oldIndex][i].key === oldKey) { 
+                // Remove the old key-value pair
+                const [removedEntry] = this.table[oldIndex].splice(i, 1);
+                
+                // Assign new key and insert into the new index
+                removedEntry.key = newKey;
+                
+                if (!this.table[newIndex]) {
+                    this.table[newIndex] = [];
+                }
+                this.table[newIndex].push(removedEntry);
+    
+                return this.table;
+            }*/
+        }
+        return { message: "Couldnt update" };
+    }
+
     remove(key) {
         const index = this.hash(key);
 
@@ -65,7 +119,7 @@ class Hashmap {
                 match.splice(i,1);
 
                 if (this.table[index].length === 0) {
-                        this.table[index] = null;
+                    this.table[index] = null;
                 }
                 return this.table;
 
@@ -92,12 +146,13 @@ class Hashmap {
 
     getAll(){
         //Creates a list object and returns
+        console.log("THIS TABLE:",this.table);
         let list = {};
         this.table.forEach((bucket, index) => {
             if (bucket) {
                 bucket.forEach((obj) => {
-                    console.log(obj);
-                    list[obj.value.id] = obj.value;
+                    console.log("BUCKET OBJ: ", obj);
+                    list[obj.key] = obj.value;
                 });
             }
         });

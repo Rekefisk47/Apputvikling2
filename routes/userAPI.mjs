@@ -1,10 +1,9 @@
 import express from "express";
-import { userMap } from "../data/hashmap.mjs";
-import { userWorkMap } from "../data/hashmap.mjs";
 import HTTP_CODES from "../utils/httpCodes.mjs";
+import { hashMap, userMap, userWorkMap} from "../data/hashmap.mjs";
 import { validateUsername } from "../modules/validate-username.mjs";
 import { passHash, verifyPassHash } from "../modules/password-hash.mjs";
-import { authenticateToken, generateAndSetCookie } from "../modules/token.mjs";
+import { authenticateToken, generateAndSetCookie, deleteCookie } from "../modules/token.mjs";
 import { createUserID } from "../modules/work-id-generator.mjs";
 
 const userRouter = express.Router();
@@ -13,6 +12,7 @@ userRouter.use(express.json());
 
 const myUserMap = userMap;
 const myUserWorkMap = userWorkMap;
+const myHashmap = hashMap;
 
 userRouter.get("/get", (req, res, next) => {
     const value = req.body.username; 
@@ -80,15 +80,40 @@ userRouter.post("/login", (req, res, next) => {
     }
 });
 
-userRouter.put("/change", validateUsername, (req, res, next) => {
+userRouter.put("/change", passHash, validateUsername, authenticateToken, (req, res, next) => {
     const value = req.body;
-    const key = value.username.toLowerCase();
-    
-    res.status(HTTP_CODES.SUCCESS.OK).json({ status: true,  message : "User changed"}).end();
+    const newUsername = value.username.toLowerCase();
+    const oldUsername = req.user.username;
+
+    //update usename (key) 
+    myUserMap.updateKey(oldUsername, newUsername);
+
+    //updates usermap with connected work (key) 
+    userWorkMap.updateKey(oldUsername, newUsername);
+
+    //update password (value)
+    value["userId"] = req.user.userId;
+    myUserMap.update(newUsername, value);
+
+    //Change the username on all their works  (if they have any) 
+    const work_ids = userWorkMap.get(newUsername);
+    if(work_ids){
+        for (let i = 0; i < work_ids.value.length; i++) {
+            let work = myHashmap.get(work_ids.value[i]);
+            work.value.author = newUsername;
+            myHashmap.update(work.key, work.value);
+        }
+    }
+
+    //COOKIE 
+    const storedUser = userMap.get(newUsername);
+    generateAndSetCookie(storedUser.value, res);
+
+    res.status(HTTP_CODES.SUCCESS.OK).json({ status: true,  message : "Username and password sucsessfully changed!"});
 });
 
-userRouter.delete("/delete", (req, res, next) => {
-    //res.status(HTTP_CODES.SUCCESS.OK).json({ message : "User deleted"}).end();
+userRouter.delete("/delete", authenticateToken, (req, res, next) => {
+    res.status(HTTP_CODES.SUCCESS.OK).json({status: true, message : "Your use has been sent to the Shadow Realm!"}).end();
 });
 
 export default userRouter
