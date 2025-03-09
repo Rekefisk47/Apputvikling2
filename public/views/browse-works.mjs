@@ -7,12 +7,9 @@ export async function init(pageData = null) {
     let works = await getAllWorks();
     console.log("////", works);
     Object.entries(works).forEach(([key, value]) => {
-        /*console.log('----------------------');
-        console.log(key, value);*/
-        
         let div = document.createElement("div");
-        div.id = value.authorId;
-        div.innerHTML = `Work-id: ${value.authorId} <br> Title: <a href="#" id="link">${value.title}</a> <br> Author: ${value.author} <br>`;
+        div.id = key;
+        div.innerHTML = `Work id: ${key} <br> Title: <a href="#" id="link">${value.title}</a> <br> Author: ${value.author} <br>`;
         if(value.summary){
             div.innerHTML += `Summary: ${value.summary} <br>`;
         }
