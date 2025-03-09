@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import HTTP_CODES from '../utils/httpCodes.mjs';
+
 //middleware for creating and validating tokens
 
 //TODO: MOVE TO ENV!!!!
@@ -35,8 +36,8 @@ function setCookie(token, res){                           //Set false bc product
     res.cookie("session", token, {maxAge: 24 * 60 * 60 * 1000, httpOnly: true, secure: false});
 }
 
-export function deleteCookie(){
-    //TODO: When user logs out
+export function deleteCookie(res){
+    res.cookie("session", "", {maxAge: 0, httpOnly: true, secure: false});
 }
 //------------------------------------//
 

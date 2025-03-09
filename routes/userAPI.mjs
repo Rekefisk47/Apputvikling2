@@ -113,6 +113,23 @@ userRouter.put("/change", passHash, validateUsername, authenticateToken, (req, r
 });
 
 userRouter.delete("/delete", authenticateToken, (req, res, next) => {
+    const username = req.user.username;
+    //remove user
+    myUserMap.remove(username);
+    //remove works
+    const work_ids = userWorkMap.get(username);
+    if(work_ids){
+        for (let i = 0; i < work_ids.value.length; i++) {
+            console.log(work_ids.value[i], "æææææ");
+            myHashmap.remove(work_ids.value[i]);
+        }
+    }
+    //remove users work array
+    myUserWorkMap.remove(username);
+
+    //remove cookie
+    deleteCookie(res);
+
     res.status(HTTP_CODES.SUCCESS.OK).json({status: true, message : "Your use has been sent to the Shadow Realm!"}).end();
 });
 
