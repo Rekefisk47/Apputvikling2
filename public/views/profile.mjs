@@ -57,7 +57,7 @@ export async function init(pageData = null){
         workData.forEach(work => {
             let div = document.createElement("div");
             div.innerHTML = `
-                <p><a href="#" id="title-link">Title: ${work.value.title}</a></p>
+                <p><b>Title: <a href="#" id="title" class="${work.key}">${work.value.title}</a></b></p>
                 <p>Summary: ${work.value.summary}</p>
                 <p>Rating: ${work.value.rating}</p>
             `
@@ -69,7 +69,7 @@ export async function init(pageData = null){
                     div.innerHTML += `${genre} || `
                 });
             }
-            div.innerHTML += `<p><a href="#" id="change-link">Change this work</a></p>`
+            div.innerHTML += `<p><a href="#" id="change-work-link" class="${work.key}">Change this work</a></p>`
             div.innerHTML += `<hr>`
 
             let workDiv = document.getElementById("work-div");
@@ -78,8 +78,13 @@ export async function init(pageData = null){
     }
 
     document.getElementById("work-div").addEventListener("click", evt => {
-        evt.preventDefault();
-        console.log(evt.target.id);
-        
+        evt.preventDefault(); 
+        pageData.works.forEach(work => {
+            if((work.key == evt.target.className) && (evt.target.id === "change-work-link")){
+                placeTemplate("change-work-template.html", "change-work.mjs", work);
+            }else if((work.key == evt.target.className) && (evt.target.id === "title")){
+                //open work
+            }
+        });
     });
 }

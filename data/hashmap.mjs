@@ -1,14 +1,17 @@
 
 class Hashmap {
-    constructor(tableSize = 16) {
+    constructor(tableName, tableSize = 16) {
         this.table = new Array(tableSize);
         this.tableSize = tableSize;
+        this.tableName = tableName;
     }
  
-    hash(key) { //TODO: add so a single number gets hashes differnlty
+    hash(key) { //TODO: add so a single number gets hashes differnlty?
+        let key2 = "key" + key; 
+        console.log(key2);
         let hashValue = 7;
-        for (let i = 0; i < key.length; i++) {
-            hashValue = (hashValue + key.charCodeAt(i) * i) % this.tableSize;
+        for (let i = 0; i < key2.length; i++) {
+            hashValue = (hashValue + key2.charCodeAt(i) * i) % this.tableSize;
         }
         return hashValue;
     }
@@ -16,6 +19,7 @@ class Hashmap {
     set(key, value){
         console.log("SETT VALUE:", key, value);
         const index = this.hash(key);
+        console.log("@@@@@", index);
 
         if (!this.table[index]) {
             this.table[index] = [];
@@ -35,20 +39,14 @@ class Hashmap {
     //updates value 
     update(key, value){
         const index = this.hash(key);
-    
-        if (!this.table[index]) {
-            return { message: "No match to update" };
-        }
 
         for (let i = 0; i < this.table[index].length; i++) {
-            if (this.table[index][i].key === key) { 
+            if (this.table[index][i].key == key) { 
                 this.table[index][i].value = value;
-
-                return this.table;  
+                return this.table;
             }
         }
-        //if no new value set: return 
-        return { message: "No match to update" };
+        return this.table;
     }
 
     //updates key
@@ -161,8 +159,8 @@ class Hashmap {
     }
 }
 
-const hashMap = new Hashmap();
-const userMap = new Hashmap();
-const userWorkMap = new Hashmap();
+const hashMap = new Hashmap("works");
+const userMap = new Hashmap("users");
+const userWorkMap = new Hashmap("user_work_map");
 
 export { hashMap, userMap, userWorkMap };

@@ -16,7 +16,7 @@ async function fetchData(method, url, formDataObj = null){
         console.log("Fetch console: ", data);
         return data;
     }catch(error){
-        console.log({ message : "Something went wrong in fetch"});
+        console.log({ message : error + " Something went wrong in fetch"});
     }
 }
 
@@ -38,8 +38,8 @@ export async function getAllWorks() {
     return fetchData("GET", "/hashmap");
 }
 
-export async function changeWork(formDataObj) {
-    return fetchData("PUT", `/hashmap/change`, formDataObj);
+export async function changeWork(workId, formDataObj) {
+    return fetchData("PUT", `/hashmap/change/${workId}`, formDataObj);
 }
 //-----------------fetch-works---------------//
 

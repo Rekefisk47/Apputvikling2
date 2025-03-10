@@ -51,18 +51,6 @@ export function init(pageData = null) {
     });
     //---------------iframe----------------//    
 
-    //---------------Append Genre--------------//
-    function appendGenre(formData){
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach((checkbox) => {
-            if(checkbox.checked === true){
-                formData.append("genre", checkbox.value);
-            }
-        });
-        return formData;
-    }
-    //---------------Append Genre--------------//
-
     //---------------Add work--------------//
     //export work formdata
     workForm.addEventListener("submit", async evt => {
@@ -90,3 +78,15 @@ export function init(pageData = null) {
     });
     //---------------Add work--------------//
 }
+
+//---------------Append Genre--------------//
+function appendGenre(formData){
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach((checkbox) => {
+        if(checkbox.checked === true){
+            formData.append("genre", checkbox.value);
+        }
+    });
+    return formData;
+}
+//---------------Append Genre--------------//

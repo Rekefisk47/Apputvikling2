@@ -23,17 +23,13 @@ hashmapRouter.get("/", async (req, res, next)  => {
 
 hashmapRouter.post("/", authenticateToken, (req, res, next) => {
     let value = req.body;
-    console.log("^^^^", req.user);
-    const author = req.user.username;
     value["author"] = req.user.username;
     value["authorId"] = req.user.userId;
-    const workId = createWorkID(); 
-    myHashmap.set(workId, value);//workId, work info
-    
+    const workId = createWorkID();     
 
+    const author = req.user.username;
     //Stores all users works in its own map
     let userWorks = myUserWorkMap.get(author);
-    console.log("$$$", userWorks);
     if(!userWorks){
         let works = [];
         works.push(workId);
@@ -41,37 +37,18 @@ hashmapRouter.post("/", authenticateToken, (req, res, next) => {
     }else{
         let test = userWorks.value;
         test.push(workId);
-        console.log("###", test);
         myUserWorkMap.update(author, test);
     }
-
-    console.log("--------------");
-    //console.log(value);
-    console.log("--------------");
-    console.log("Authenticated user:", req.user.username);
-    console.log("--------------");
-    /*
-    //add to map for easy lookup
-    if (!myUserWorkMap[author.toLowerCase()]) {
-        myUserWorkMap[author.toLowerCase()] = [];
-    }
-    myUserWorkMap[author.toLowerCase()].push(key, value); 
-    console.log(myUserWorkMap);
-    */
-   
-    //myUserWorkMap.set(author, key);
-    //---------------------------//
     
+    myHashmap.set(workId, value); //workId, work info
     res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message: "You have created a beautiful piece of work!"});
 });
 
-hashmapRouter.put("/:work_id", (req, res, next) => {
-    const bodyData = req.body;
-    const value = bodyData;
-
-    const key = "work" + req.params.work_id;
-
-    res.status(HTTP_CODES.SUCCESS.OK).json(myHashmap.update(key, value)).end();
+hashmapRouter.put("/change/:work_id", (req, res, next) => {
+    const value = req.body;
+    const key = req.params.work_id;
+    myHashmap.update(key, value);
+    res.status(HTTP_CODES.SUCCESS.OK).json({ status : true, message : "Your work has updated!" });
 });
 
 hashmapRouter.delete("/:work_id", (req, res, next) => {
