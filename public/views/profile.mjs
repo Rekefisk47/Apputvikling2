@@ -5,10 +5,10 @@ import { changeUser, deleteUser, getUserProfile } from "../modules/fetch-data.mj
 
 export async function init(pageData = null){
 
-    let username = document.getElementById("username");
-    let userId = document.getElementById("userId");
-    username.innerHTML =  pageData.user.value.username;
-    userId.innerHTML = "My user id is: " + pageData.user.value.userId;
+    const username = document.getElementById("username");
+    const userId = document.getElementById("userId");
+    username.innerText =  pageData.user.value.username;
+    userId.innerText = "My user id is: " + pageData.user.value.userId;
 
     document.getElementById("changeBtn").addEventListener("click", () => {
         let changeUser = document.getElementById("change-user-container");
@@ -47,5 +47,39 @@ export async function init(pageData = null){
         }else{
             messagehandler(response.message);
         }
+    });
+
+    const userWorksContainer = document.getElementById("user-works-container");
+    if(pageData.works){
+        userWorksContainer.style.display = "block";
+
+        const workData = pageData.works;
+        workData.forEach(work => {
+            let div = document.createElement("div");
+            div.innerHTML = `
+                <p><a href="#" id="title-link">Title: ${work.value.title}</a></p>
+                <p>Summary: ${work.value.summary}</p>
+                <p>Rating: ${work.value.rating}</p>
+            `
+            div.innerHTML += `Genre: `
+            if(typeof work.value.genre === "string"){
+                div.innerHTML += `${work.value.genre}`;
+            }else if(Array.isArray(work.value.genre)){
+                work.value.genre.forEach(genre => {
+                    div.innerHTML += `${genre} || `
+                });
+            }
+            div.innerHTML += `<p><a href="#" id="change-link">Change this work</a></p>`
+            div.innerHTML += `<hr>`
+
+            let workDiv = document.getElementById("work-div");
+            workDiv.appendChild(div);
+        });
+    }
+
+    document.getElementById("work-div").addEventListener("click", evt => {
+        evt.preventDefault();
+        console.log(evt.target.id);
+        
     });
 }

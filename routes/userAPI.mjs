@@ -28,8 +28,17 @@ userRouter.get("/get", (req, res, next) => {
 userRouter.get("/profile", authenticateToken, (req, res, next) => {
     const loggedInUser = req.user.username; 
     const key = loggedInUser.toLowerCase();
+    
+    const worksArray = myUserWorkMap.get(key);
+    let works = [];
+    if(worksArray){
+        worksArray.value.forEach(workId => {
+            works.push(myHashmap.get(workId));
+        });
+    }
+
     try{
-        res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message: "HERE U GO", user :  userMap.get(key), works: myUserWorkMap.get(key) });
+        res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message: "Here is your user!", user :  userMap.get(key), works: works });
     }catch(error){ 
         res.status(HTTP_CODES.SERVER_ERROR.INTERNAL_SERVER_ERROR).json({ status: false, message: "Couldn't find your profile?."});
     }
@@ -126,10 +135,8 @@ userRouter.delete("/delete", authenticateToken, (req, res, next) => {
     }
     //remove users work array
     myUserWorkMap.remove(username);
-
     //remove cookie
     deleteCookie(res);
-
     res.status(HTTP_CODES.SUCCESS.OK).json({status: true, message : "Your use has been sent to the Shadow Realm!"}).end();
 });
 
