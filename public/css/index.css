@@ -21,3 +21,14 @@ iframe {
 .type-center {
     text-align: center;
 }
+input[type="checkbox"] {
+    width: 24px;
+    height: 24px;
+}
+select {
+    min-width: 200px;
+    min-height: 44px;   
+    padding: 10px;    
+    font-size: 16px; 
+    border-radius: 6px; 
+}

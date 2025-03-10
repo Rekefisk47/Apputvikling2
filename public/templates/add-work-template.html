@@ -6,15 +6,17 @@
                 <legend>Add book:</legend>
                 <input type="text" name="title" placeholder="Title" autocomplete="off" required>
                 <br>
+                <label for="select-rating">Rating:</label>
+                <br>
                 <select id="select-rating" name="rating">
                     <option selected="selected" value="">Choose a rating</option>
                     <option value="General">General</option>
                     <option value="Teen">Teen</option>
                     <option value="Young Adult">Young adult</option>
                     <option value="Adult">Adult</option>
-                </select><br>
-
-                <ul>
+                </select>
+                <br>
+                <ul style="list-style: none; padding: 0; margin: 0;">
                     <li>
                         <input type="checkbox" id="genre-horror" name="genre" value="Horror">
                         <label for="genre-horror">Horror</label>
@@ -37,17 +39,18 @@
                     </li>
                     <li>
                         <input type="checkbox" id="genre-other" name="genre" value="Other">
-                        <label for="genre-fantasy">Other</label>
+                        <label for="genre-other">Other</label>
                     </li>
                 </ul>
-                <textarea name="summary" placeholder="Summary"></textarea>
+               
+                <textarea name="summary" placeholder="Add a short summary" style="width: 300px; height: 120px;"></textarea>
                 <br>
                 <div id="text-editor">
                     <div class="tools" id="tools">
                         <button class="tools-btn" id="Bold" aria-pressed="false">Bold</button>
                         <button class="tools-btn" id="Italic" aria-pressed="false">Italic</button>
                     </div>
-                    <iframe id="content" name="content" placeholder="Content" contenteditable="true" height="170" width="100%"></iframe><br>
+                    <iframe id="content" name="content" placeholder="Content" contenteditable="true" height="200" width="100%" title="Rich text content area for editing text"></iframe><br>
                 </div>
 
                 <input id="submitBtn" type="submit" value="Submit">
