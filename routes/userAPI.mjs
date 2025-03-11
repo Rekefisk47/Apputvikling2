@@ -94,6 +94,11 @@ userRouter.put("/change", passHash, validateUsername, authenticateToken, (req, r
     const newUsername = value.username.toLowerCase();
     const oldUsername = req.user.username;
 
+    //check if username already exists
+    if(myUserMap.get(newUsername)){
+        return res.status(HTTP_CODES.CLIENT_ERROR.BAD_REQUEST).json({ status: false, message: 'Username already exists' });
+    }
+    
     //update usename (key) 
     myUserMap.updateKey(oldUsername, newUsername);
 
