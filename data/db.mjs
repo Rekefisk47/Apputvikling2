@@ -1,9 +1,6 @@
-import pkg from 'pg';
-const { Client } = pkg;
+import pg from 'pg';
 
-console.info(process.env.DB_CREDENTIALS);
-
-const Config = {
+const config = {
     connectionString: process.env.DB_CREDENTIALS,
     ssl: (process.env.DB_SSL === "true") ? process.env.DB_SSL : false,
 }
@@ -24,11 +21,11 @@ async function purge(statement, ...values){
 }
 
 async function runQuery(query, ...values){
-    const client = new Client(Config);
+    const client = new pg.Client(config);
     try{
 
-        client.connect();
-        client.query(statement, [...values])
+        await client.connect();
+        const result = client.query(statment, [...values]);
 
         if(result.rowcount <= 0){
            throw new Error("No records stated"); 
@@ -46,3 +43,5 @@ async function runQuery(query, ...values){
         client.close();
     }
 }
+
+export { create, update, read, purge};

@@ -9,17 +9,17 @@ CREATE TABLE "public"."works" (
 
 CREATE TABLE "public"."users" (
     "id" integer GENERATED ALWAYS AS IDENTITY,
-    "username" text NOT NULL,
-    "data" jsonb NOT NULL,
+    "key" text NOT NULL,
+    "value" jsonb NOT NULL,
     PRIMARY KEY ("id"),
-    UNIQUE ("username")
+    UNIQUE ("key")
 );
 
 CREATE TABLE "public"."user_work_map" (
     "id" integer GENERATED ALWAYS AS IDENTITY,
-    "username" text NOT NULL,
-    "works" jsonb NOT NULL,
+    "key" text NOT NULL,
+    "value" jsonb NOT NULL,
     PRIMARY KEY ("id"),
-    UNIQUE ("username")
+    UNIQUE ("key")
 );
 
