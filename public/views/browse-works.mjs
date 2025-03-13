@@ -22,10 +22,20 @@ export async function init(pageData = null) {
             
             div.innerHTML = `<h3 style="margin:0"> Title: <a href="#" id="link">${value.value.title}</a></h3> Author: ${value.value.author} <br>`;
             if(value.value.rating){
-                div.innerHTML += `Rating: ${value.value.rating}  <br>`;
+                div.innerHTML += `Rating: ${value.value.rating} `;
             }
+
+            div.innerHTML += `<br> Genre: `
+            if(typeof value.value.genre === "string"){
+                div.innerHTML += `${value.value.genre}`;
+            }else if(Array.isArray(value.value.genre)){
+                value.value.genre.forEach(genre => {
+                    div.innerHTML += `${genre} || `
+                });
+            }
+
             if(value.value.summary){
-                div.innerHTML += `Summary: ${value.value.summary} <br>`;
+                div.innerHTML += `<br> Summary: ${value.value.summary} <br>`;
             }
 
             fieldset.appendChild(div);

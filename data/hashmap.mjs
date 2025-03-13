@@ -231,10 +231,8 @@ class Hashmap {
     }
     
     async get(key) {
-        console.log(key);
         //Get from database
         const result = await read(`SELECT id, key, value FROM "public"."${this.tableName}" WHERE key = $1`, key);
-        console.log(result);
         if(result && result.rows && result.rows.length <= 0){
             return false;
         }else{
