@@ -48,10 +48,10 @@ hashmapRouter.post("/", authenticateToken, async (req, res, next) => {
     res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message: "You have created a beautiful piece of work!"});
 });
 
-hashmapRouter.put("/change/:work_id", (req, res, next) => {
+hashmapRouter.put("/change/:work_id", async (req, res, next) => {
     const value = req.body;
     const key = req.params.work_id;
-    myHashmap.update(key, value);
+    await myHashmap.update(key, value);
     res.status(HTTP_CODES.SUCCESS.OK).json({ status : true, message : "Your work has updated!" });
 });
 

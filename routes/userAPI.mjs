@@ -44,6 +44,7 @@ userRouter.get("/profile", authenticateToken, async (req, res, next) => {
 });
 
 userRouter.post("/create", passHash, validateUsername, async (req, res, next) => {
+    console.log("-------------------------",req.body);
     const value = req.body;
     const key = value.username.toLowerCase();
   
@@ -59,10 +60,9 @@ userRouter.post("/create", passHash, validateUsername, async (req, res, next) =>
         //create a user ID //REMOVE LATER
         value["userId"] = createUserID();
         */
+       
         //add user to datastructure
-        await myUserMap.set(key, value);
-        
-        res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message : "User sucsessfully created!"});
+        res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message : "User sucsessfully created!", reponse: await myUserMap.set(key, value) });
     }
 });
 
@@ -73,6 +73,7 @@ userRouter.post("/login", async (req, res, next) => {
     try{
         //gets and checks for mathing hash
         const storedUser = await userMap.get(key);
+        console.log(storedUser);
         const storedHash = storedUser.value.password;
         const storedSalt = storedUser.value.salt;
 

@@ -16,21 +16,26 @@ class Hashmap {
     //put it in local for faste lookup
     async loadFromDatabase(tableName) {
         const result = await read(`SELECT key, value FROM "public"."${tableName}"`);
+        /*
         console.log("+++++¨¨¨+++++");
         console.log(result.rows);
-        console.log(this.table);
+        console.log(result.rows.length);
         console.log("+++++¨¨¨+++++");
-        if(result != null){
-            result.rows.forEach(({ key, value }) => {
-                const index = this.hash(key);
-                console.log(index, "@@@@@");
+        */
+        if(result.rows.length > 0){
+            let item = result.rows;
+            for (let i = 0; i < result.rows.length; i++) {
+                console.log(item[i]);
+                console.log(item[i].key);
 
+                let index = this.hash(item[i].key);
                 if (!this.table[index]) {
                     this.table[index] = [];
                 }
-                
-                this.table[index].push({ key, value });
-            });
+                this.table[index].push(item[i]);
+
+                console.log(this.table, "FINISH");
+            }
         }
     }
  
@@ -84,16 +89,16 @@ class Hashmap {
     async update(key, value){
         //updates value in database
         const result = await update(`UPDATE "public"."${this.tableName}" SET value = $2::jsonb WHERE key = $1 RETURNING id`, key, JSON.stringify(value));
-        console.log("++++++++++");
-        console.log(result); 
-        console.log("++++++++++");
+        //console.log("++++++++++");
+        //console.log(result); 
+        //console.log("++++++++++");
         if(!result || result.rows.length === 0){
             throw new Error("Failed to update VALUE in Database");
         }
     
         return { success: true, message: "Value updated successfully!", id: result.rows[0].id };
         /*
-        const index = this.hash(key);
+    
 
         for (let i = 0; i < this.table[index].length; i++) {
             if (this.table[index][i].key == key) { 
@@ -226,57 +231,24 @@ class Hashmap {
     }
     
     async get(key) {
-        const index = this.hash(key);
-
+        console.log(key);
+        //Get from database
         const result = await read(`SELECT id, key, value FROM "public"."${this.tableName}" WHERE key = $1`, key);
+        console.log(result);
         if(result && result.rows && result.rows.length <= 0){
             return false;
         }else{
             console.log(result.rows[0]);
-            console.log(typeof result.rows[0]);
             return result.rows[0];
         }
-
-        //ADD TO LOCAL TOO FOR FASTER LOOKUP
-        /*
-        if (!this.table[index]) {  
-            console.log("Local is undefined, querying the database...");
-            // If not found in local, check the database instead
-            const result = await read(`SELECT id, key, value FROM "public"."${this.tableName}" WHERE key = $1`, key);
-            if(result && result.rows && result.rows.length <= 0){
-                return false;
-            }else{
-                //save in local 
-                if (!this.table[index]) {
-                    this.table[index] = [];
-                }
-
-                this.table[index].push(result.rows[0]);
-
-                return this.table[index] || true;
-            }
-        }else{
-            for (let i = 0; i < this.table[index].length; i++) {
-                if (this.table[index][i].key === key) {
-                    //console.log(this.table[index][i]);
-                    //console.log("AFIWJFIAWJFAJOFJw");
-                    return this.table[index][i] || true;
-                }else{
-                    return false;
-                }
-            }
-        }
-        */
     }
 
-    async getAll(){
-        //await this.loadFromDatabase(this.tableName);
+    async getAll(){ //gets all entries
+        
 
         const result = await read(`SELECT * FROM "public"."${this.tableName}"`);
-        if(!result || result.rows.length <= 0){
-            throw new Error("Couldn't show library...");
-        }
         return result.rows;
+
 
         /*
         //Creates a list object and returns

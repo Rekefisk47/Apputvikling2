@@ -109,7 +109,7 @@ export async function init(pageData = null){
                     document.getElementById("loading").showModal();
                     let response =  await deleteWork(work.key);
                     if(response.status){
-                        messagehandler(response.response.message);
+                        messagehandler(response.message);
                         //reload profile
                         const profile = await getUserProfile();
                         placeTemplate("profile-template.html", "profile.mjs", profile);
