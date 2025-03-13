@@ -26,8 +26,9 @@ export async function addWork(formDataObj) {
     return fetchData("POST", "/hashmap", formDataObj);
 }
 
-export async function deleteWork(formDataObj) {
-    return fetchData("DELETE", `/hashmap/${formDataObj.workId}`);
+export async function deleteWork(workId) {
+    console.log(workId);
+    return fetchData("DELETE", `/hashmap/${workId}`);
 }
 
 export async function getWork(formDataObj) {
@@ -69,3 +70,34 @@ export async function deleteUser() {
     return fetchData("DELETE", "/user/delete");
 }
 //-----------------fetch-users---------------//
+
+
+/*
+const HTTP_METHODS = {
+    GET : "GET",
+    POST : "POST",
+    PATCH : "PATCH",
+    PUT : "PUT"
+}
+
+const API_ENDPOINTS = {
+    GetTree : "/tree",
+}
+
+async function retrieveUsersTecTre(userId){
+    const tree = await runRequest(API_ENDPOINTS.GetTree);
+}
+
+async function runRequest(path, method = HTTP_METHODS.GET, data = null){
+    const request = {
+        method,
+        headers: {
+            "Content-type": "application/json"
+        }
+    }
+
+    if(HTTP_METHODS.POST, HTTP_METHODS.PUT, HTTP_METHODS, PUT.any(method)){
+        request.body = JSON.stringify(data);
+    }
+}
+*/

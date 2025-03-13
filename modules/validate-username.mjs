@@ -11,4 +11,3 @@ export const validateUsername = (req, res, next) => {
 
     next();
 };
-

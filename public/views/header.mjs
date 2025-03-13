@@ -17,7 +17,9 @@ export function init(pageData = null) {
         placeTemplate("add-work-template.html", "add-work.mjs");
     });
     document.getElementById("profileBtn").addEventListener("click", async () => {
+        document.getElementById("loading").showModal();
         const profile = await getUserProfile();
+        document.getElementById("loading").close();
         if(!profile.status){
             messagehandler(profile.message);
         }else{

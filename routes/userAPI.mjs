@@ -14,37 +14,36 @@ const myUserMap = userMap;
 const myUserWorkMap = userWorkMap;
 const myHashmap = hashMap;
 
-userRouter.get("/get", (req, res, next) => {
+userRouter.get("/get", async (req, res, next) => {
     const value = req.body.username; 
     const key = value.toLowerCase();
     
     try{
-        res.status(HTTP_CODES.SUCCESS.OK).send(myUserMap.get(key)).end();
+        res.status(HTTP_CODES.SUCCESS.OK).send(await myUserMap.get(key)).end();
     }catch(error){
         res.status(HTTP_CODES.SERVER_ERROR.INTERNAL_SERVER_ERROR).json({message: "No match found."});
     }
 });
 
-userRouter.get("/profile", authenticateToken, (req, res, next) => {
+userRouter.get("/profile", authenticateToken, async (req, res, next) => {
     const loggedInUser = req.user.username; 
     const key = loggedInUser.toLowerCase();
-    
-    const worksArray = myUserWorkMap.get(key);
-    let works = [];
-    if(worksArray){
-        worksArray.value.forEach(workId => {
-            works.push(myHashmap.get(workId));
-        });
-    }
-
     try{
-        res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message: "Here is your user!", user :  userMap.get(key), works: works });
+        const worksArray = await myUserWorkMap.get(key);
+        let works = [];
+        if(worksArray){
+            for (let i = 0; i < worksArray.value.length; i++) {
+                let work = await myHashmap.get(worksArray.value[i]);
+                works.push(work);
+            }
+        }
+        res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message: "Here is your user!", user :  await userMap.get(key), works: works });
     }catch(error){ 
-        res.status(HTTP_CODES.SERVER_ERROR.INTERNAL_SERVER_ERROR).json({ status: false, message: "Couldn't find your profile?."});
+        res.status(HTTP_CODES.SERVER_ERROR.INTERNAL_SERVER_ERROR).json({ status: false, message: "Hippity hoppity this is not your property!"});
     }
 });
 
-userRouter.post("/create", passHash, validateUsername, (req, res, next) => {
+userRouter.post("/create", passHash, validateUsername, async (req, res, next) => {
     const value = req.body;
     const key = value.username.toLowerCase();
   
@@ -53,24 +52,27 @@ userRouter.post("/create", passHash, validateUsername, (req, res, next) => {
         return res.status(HTTP_CODES.CLIENT_ERROR.BAD_REQUEST).json({ status: false, message: 'Valid username is required' });
     }
     //if username already exists
-    if(myUserMap.get(key)){
+    if(await myUserMap.get(key)){
         return res.status(HTTP_CODES.CLIENT_ERROR.BAD_REQUEST).json({ status: false, message: 'Username already exists' });
     }else{
-        //create a user ID
+        /*
+        //create a user ID //REMOVE LATER
         value["userId"] = createUserID();
+        */
         //add user to datastructure
-        myUserMap.set(key, value)
-        res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message : "User sucsessfully created!"}).end();
+        await myUserMap.set(key, value);
+        
+        res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message : "User sucsessfully created!"});
     }
 });
 
-userRouter.post("/login", (req, res, next) => {
+userRouter.post("/login", async (req, res, next) => {
     const value = req.body;
     const key = value.username.toLowerCase();
 
     try{
         //gets and checks for mathing hash
-        const storedUser = userMap.get(key);
+        const storedUser = await userMap.get(key);
         const storedHash = storedUser.value.password;
         const storedSalt = storedUser.value.salt;
 
@@ -89,49 +91,53 @@ userRouter.post("/login", (req, res, next) => {
     }
 });
 
-userRouter.put("/change", passHash, validateUsername, authenticateToken, (req, res, next) => {
+userRouter.put("/change", passHash, validateUsername, authenticateToken, async (req, res, next) => {
     const value = req.body;
     const newUsername = value.username.toLowerCase();
     const oldUsername = req.user.username;
 
     //check if username already exists
-    if(myUserMap.get(newUsername)){
+    if(await myUserMap.get(newUsername)){
         return res.status(HTTP_CODES.CLIENT_ERROR.BAD_REQUEST).json({ status: false, message: 'Username already exists' });
     }
     
     //update usename (key) 
-    myUserMap.updateKey(oldUsername, newUsername);
+    await myUserMap.updateKey(oldUsername, newUsername);
 
     //updates usermap with connected work (key) 
-    userWorkMap.updateKey(oldUsername, newUsername);
-
+    await userWorkMap.updateKey(oldUsername, newUsername);
+      
     //update password (value)
-    value["userId"] = req.user.userId;
-    myUserMap.update(newUsername, value);
+    //value["userId"] = req.user.userId;
+    await myUserMap.update(newUsername, value);
 
     //Change the username on all their works  (if they have any) 
-    const work_ids = userWorkMap.get(newUsername);
+    const work_ids = await userWorkMap.get(newUsername);
+    console.log(work_ids, "^^^^^^^^^^^^^");
     if(work_ids){
         for (let i = 0; i < work_ids.value.length; i++) {
-            let work = myHashmap.get(work_ids.value[i]);
+            let work = await myHashmap.get(work_ids.value[i]);
             work.value.author = newUsername;
-            myHashmap.update(work.key, work.value);
+            await myHashmap.update(work.key, work.value);
         }
     }
-
+    
     //COOKIE 
-    const storedUser = userMap.get(newUsername);
+    const storedUser = await userMap.get(newUsername);
+    console.log("^^^COOKIE:^^^");
+    console.log(storedUser);
+    console.log("^^^COOKIE:^^^");
     generateAndSetCookie(storedUser.value, res);
 
     res.status(HTTP_CODES.SUCCESS.OK).json({ status: true,  message : "Username and password sucsessfully changed!"});
 });
 
-userRouter.delete("/delete", authenticateToken, (req, res, next) => {
+userRouter.delete("/delete", authenticateToken, async (req, res, next) => {
     const username = req.user.username;
     //remove user
-    myUserMap.remove(username);
+    await myUserMap.remove(username);
     //remove works
-    const work_ids = userWorkMap.get(username);
+    const work_ids = await userWorkMap.get(username);
     if(work_ids){
         for (let i = 0; i < work_ids.value.length; i++) {
             console.log(work_ids.value[i], "æææææ");
@@ -139,7 +145,7 @@ userRouter.delete("/delete", authenticateToken, (req, res, next) => {
         }
     }
     //remove users work array
-    myUserWorkMap.remove(username);
+    await myUserWorkMap.remove(username);
     //remove cookie
     deleteCookie(res);
     res.status(HTTP_CODES.SUCCESS.OK).json({status: true, message : "Your use has been sent to the Shadow Realm!"}).end();

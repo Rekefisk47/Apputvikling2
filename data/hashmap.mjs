@@ -1,14 +1,41 @@
+import { create, update, read, purge } from "./db.mjs";
+
+const ALLOWED_TABLES = ["users", "works", "user_work_map"];
 
 class Hashmap {
     constructor(tableName, tableSize = 16) {
+        if (!ALLOWED_TABLES.includes(tableName)) {
+            throw new Error(`Invalid table name: ${tableName}`);
+        }
         this.table = new Array(tableSize);
         this.tableSize = tableSize;
         this.tableName = tableName;
     }
+    
+    //first time you get something from database
+    //put it in local for faste lookup
+    async loadFromDatabase(tableName) {
+        const result = await read(`SELECT key, value FROM "public"."${tableName}"`);
+        console.log("+++++¨¨¨+++++");
+        console.log(result.rows);
+        console.log(this.table);
+        console.log("+++++¨¨¨+++++");
+        if(result != null){
+            result.rows.forEach(({ key, value }) => {
+                const index = this.hash(key);
+                console.log(index, "@@@@@");
+
+                if (!this.table[index]) {
+                    this.table[index] = [];
+                }
+                
+                this.table[index].push({ key, value });
+            });
+        }
+    }
  
     hash(key) { //TODO: add so a single number gets hashes differnlty?
-        let key2 = "key" + key; 
-        console.log(key2);
+        let key2 = "key-" + key; 
         let hashValue = 7;
         for (let i = 0; i < key2.length; i++) {
             hashValue = (hashValue + key2.charCodeAt(i) * i) % this.tableSize;
@@ -16,41 +43,71 @@ class Hashmap {
         return hashValue;
     }
 
-    set(key, value){
-        console.log("SETT VALUE:", key, value);
+    async set(key, value){
+        /*
         const index = this.hash(key);
-        console.log("@@@@@", index);
-
+        //saves to local hashmap
         if (!this.table[index]) {
             this.table[index] = [];
         }
-
         for (let i = 0; i < this.table[index].length; i++) {
             if (this.table[index][i].key === key) {
                 return { message: "This key already exists" };
             }
         }
-        
         this.table[index].push({ key, value });
+        */
 
-        return this.table;
+        if(key === null){ //works
+            const inserted = await create(`INSERT INTO "public"."${this.tableName}" ("key", "value") VALUES ($1, $2::jsonb) RETURNING *`, "placeholder", value);
+            const result = await update(`UPDATE "public"."${this.tableName}" SET key = $1 WHERE key = $2 RETURNING *`, inserted.rows[0].id, inserted.rows[0].key );
+            //console.log("#######");
+            //console.log(result); 
+            //console.log("#######");
+            if (!inserted || inserted.rows.length === 0) {
+                throw new Error("Failed to insert work into Database");
+            }
+            return result;
+        }else{ //users
+            //saves to database (useres = works)
+            const result = await create(`INSERT INTO "public"."${this.tableName}" ("key", "value") VALUES ($1, $2::jsonb) RETURNING *`, key, JSON.stringify(value));
+            if(!result || result.rows.length === 0){
+                throw new Error("Failed to insert item into Database");
+            }
+        }
+    
+        
+        //return this.table;
     }
 
     //updates value 
-    update(key, value){
+    async update(key, value){
+        //updates value in database
+        const result = await update(`UPDATE "public"."${this.tableName}" SET value = $2::jsonb WHERE key = $1 RETURNING id`, key, JSON.stringify(value));
+        console.log("++++++++++");
+        console.log(result); 
+        console.log("++++++++++");
+        if(!result || result.rows.length === 0){
+            throw new Error("Failed to update VALUE in Database");
+        }
+    
+        return { success: true, message: "Value updated successfully!", id: result.rows[0].id };
+        /*
         const index = this.hash(key);
 
         for (let i = 0; i < this.table[index].length; i++) {
             if (this.table[index][i].key == key) { 
                 this.table[index][i].value = value;
+      
                 return this.table;
             }
         }
         return this.table;
+        */
     }
 
     //updates key
-    updateKey(oldKey, newKey){
+    async updateKey(oldKey, newKey){
         const oldIndex = this.hash(oldKey);
         const newIndex = this.hash(newKey);
         /*
@@ -59,6 +116,26 @@ class Hashmap {
         console.log(this.table);
         console.log(this.table[oldIndex]);
         */
+        console.log("Updating key in table:", this.tableName);
+        console.log("Old key:", oldKey);
+        console.log("New key:", newKey);
+        console.log(this.tableName, "<----->");
+
+        // Update the key in the database
+        const test = await read(
+            `SELECT key, value FROM "public"."${this.tableName}" WHERE "key" = $1;`, oldKey.toString());        
+        console.log("Check if oldKey exists:", test);
+
+        const result = await update(`UPDATE "public"."${this.tableName}" SET key = $2 WHERE key = $1 RETURNING *;`, oldKey, newKey);
+        console.log("&&&&&&&");
+        console.log(result);
+        console.log("&&&&&&&");
+        if ((!result || result.rows.length === 0) && this.tableName === "users") {
+            throw new Error("Failed to update KEY in Database", oldKey, newKey);
+        }
+        console.log("Key updated successfully.");
+
+        /*
         if (!this.table[oldIndex]) {
             return { message: "No match to update" };
         }
@@ -84,6 +161,7 @@ class Hashmap {
 
                 return this.table;
             }
+            */
             /*if (this.table[oldIndex][i].key === oldKey) { 
                 // Remove the old key-value pair
                 const [removedEntry] = this.table[oldIndex].splice(i, 1);
@@ -98,51 +176,109 @@ class Hashmap {
     
                 return this.table;
             }*/
-        }
-        return { message: "Couldnt update" };
+        //}
+        //return { message: "Couldnt update" };
     }
 
-    remove(key) {
+    async remove(key) {
+        if(this.tableName == "users"){
+            await purge(`DELETE FROM "public"."${this.tableName}" WHERE "key" = $1 RETURNING *;`, key);
+            return { message : "Removed user!" };
+        }else if(this.tableName == "works"){
+            await purge(`DELETE FROM "public"."${this.tableName}" WHERE "key" = $1;`, key);
+        }
+      
+        /*
         const index = this.hash(key);
 
         if (!this.table[index]) {
             return { message: "No key to remove" };
         }
         let message;
-      
+
         for (let i = 0; i < this.table[index].length; i++) {
             if (this.table[index][i].key === key) {
-
+                //delete from local hashmap
                 let match = this.table[index];
                 match.splice(i,1);
-
                 if (this.table[index].length === 0) {
                     this.table[index] = null;
                 }
+
+                //delete from database
+                const result = await purge(`DELETE FROM "public"."${this.tableName}" WHERE key = $1;`, key);
+                console.log("++++++++++");
+                console.log(result); 
+                console.log("++++++++++");
+                if(!result){
+                    throw new Error("Failed to delete item into Database");
+                }
+
                 return this.table;
 
             }else if(this.table[index][i].key != key){
                 message = { message: "No key to remove" };
             }
         }
+
         return message;
+        */
     }
     
-    get(key) {
+    async get(key) {
         const index = this.hash(key);
 
-        if (!this.table[index]) {
-            return null;
+        const result = await read(`SELECT id, key, value FROM "public"."${this.tableName}" WHERE key = $1`, key);
+        if(result && result.rows && result.rows.length <= 0){
+            return false;
+        }else{
+            console.log(result.rows[0]);
+            console.log(typeof result.rows[0]);
+            return result.rows[0];
         }
 
-        for (let i = 0; i < this.table[index].length; i++) {
-            if (this.table[index][i].key === key) {
-                return this.table[index][i];
+        //ADD TO LOCAL TOO FOR FASTER LOOKUP
+        /*
+        if (!this.table[index]) {  
+            console.log("Local is undefined, querying the database...");
+            // If not found in local, check the database instead
+            const result = await read(`SELECT id, key, value FROM "public"."${this.tableName}" WHERE key = $1`, key);
+            if(result && result.rows && result.rows.length <= 0){
+                return false;
+            }else{
+                //save in local 
+                if (!this.table[index]) {
+                    this.table[index] = [];
+                }
+
+                this.table[index].push(result.rows[0]);
+
+                return this.table[index] || true;
+            }
+        }else{
+            for (let i = 0; i < this.table[index].length; i++) {
+                if (this.table[index][i].key === key) {
+                    //console.log(this.table[index][i]);
+                    //console.log("AFIWJFIAWJFAJOFJw");
+                    return this.table[index][i] || true;
+                }else{
+                    return false;
+                }
             }
         }
+        */
     }
 
-    getAll(){
+    async getAll(){
+        //await this.loadFromDatabase(this.tableName);
+
+        const result = await read(`SELECT * FROM "public"."${this.tableName}"`);
+        if(!result || result.rows.length <= 0){
+            throw new Error("Couldn't show library...");
+        }
+        return result.rows;
+
+        /*
         //Creates a list object and returns
         console.log("THIS TABLE:",this.table);
         let list = {};
@@ -156,6 +292,7 @@ class Hashmap {
         });
         return list;
         //return this.table;
+        */
     }
 }
 

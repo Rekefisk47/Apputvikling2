@@ -1,11 +1,43 @@
-import pg from 'pg';
+import pkg from "pg";
+const { Client } = pkg;
 
 const config = {
     connectionString: process.env.DB_CREDENTIALS,
-    ssl: (process.env.DB_SSL === "true") ? process.env.DB_SSL : false,
+    ssl: { rejectUnauthorized: false }
+    //ssl: (process.env.DB_SSL === "true") ? process.env.DB_SSL : false,
 }
 
 //await client.connect();
+
+async function runQuery(query, ...values){
+    const client = new Client(config);
+    try{
+
+        await client.connect();
+        const result = await client.query(query, values);
+
+        /*
+        if(result.rowCount <= 0 ){
+            throw new Error("No records created");
+        } 
+        */
+
+        console.log("Connected to database");
+        return result;
+
+    }catch(error){
+
+        //feilhåndtering
+        console.log("---------------------");
+        console.log(query);
+        console.log("Connection error: ", error);
+        return null;
+        
+    }finally{
+        console.log("Database closed");
+        client.end();
+    }
+}
 
 async function create(statement, ...values){
     return await runQuery(statement, ...values);
@@ -18,30 +50,6 @@ async function read(statement, ...values){
 }
 async function purge(statement, ...values){
     return await runQuery(statement, ...values);
-}
-
-async function runQuery(query, ...values){
-    const client = new pg.Client(config);
-    try{
-
-        await client.connect();
-        const result = client.query(statment, [...values]);
-
-        if(result.rowcount <= 0){
-           throw new Error("No records stated"); 
-        }
-
-        return result.row[0];
-
-    }catch(error){
-
-        //feilhåndtering
-        console.log(error);
-        return null;
-        
-    }finally{
-        client.close();
-    }
 }
 
 export { create, update, read, purge};

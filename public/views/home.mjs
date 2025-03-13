@@ -1,6 +1,5 @@
-import { placeTemplate } from "../modules/load-views.mjs";
 
-export function init() {
+export function init(pageData = null) {
     console.log("Home script loaded");
 
     

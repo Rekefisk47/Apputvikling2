@@ -19,7 +19,10 @@ export function init(pageData = null) {
         const formDataObj = formDataToObject(formData);
         
         //fetch response 
+        document.getElementById("loading").showModal();
         let response =  await addUser(formDataObj);
+        document.getElementById("loading").close();
+
         if(response.status){
             messagehandler(response.message);
             placeTemplate("login-user-template.html", "login-user.mjs");

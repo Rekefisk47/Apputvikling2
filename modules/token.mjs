@@ -3,8 +3,7 @@ import HTTP_CODES from '../utils/httpCodes.mjs';
 
 //middleware for creating and validating tokens
 
-//TODO: MOVE TO ENV!!!!
-const secretKey = "secret";
+const secretKey = process.env.SECRET_KEY;
 
 //------------------------------------//
 //SETS A COOKIE

@@ -5,7 +5,7 @@ CREATE TABLE "public"."works" (
     "value" jsonb NOT NULL,
     PRIMARY KEY ("id"),
     UNIQUE ("key")
-);
+); 
 
 CREATE TABLE "public"."users" (
     "id" integer GENERATED ALWAYS AS IDENTITY,

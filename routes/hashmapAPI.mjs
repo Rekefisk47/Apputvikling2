@@ -18,29 +18,33 @@ hashmapRouter.get("/:id", (req, res, next) => {
 });
 
 hashmapRouter.get("/", async (req, res, next)  => {
-    res.status(HTTP_CODES.SUCCESS.OK).json(myHashmap.getAll());
+    try{
+        res.status(HTTP_CODES.SUCCESS.OK).json(await myHashmap.getAll());
+    }catch(error){
+        res.status(HTTP_CODES.SUCCESS.OK).json({ status : false, message : "Nothing here yet. soory." });
+    }
 });
 
-hashmapRouter.post("/", authenticateToken, (req, res, next) => {
+hashmapRouter.post("/", authenticateToken, async (req, res, next) => {
     let value = req.body;
     value["author"] = req.user.username;
-    value["authorId"] = req.user.userId;
-    const workId = createWorkID();     
+    //value["authorId"] = req.user.userId;
+    //const workId = createWorkID();
 
+    const work = await myHashmap.set(null, value); //save user work
+    
     const author = req.user.username;
-    //Stores all users works in its own map
-    let userWorks = myUserWorkMap.get(author);
+    let userWorks = await myUserWorkMap.get(author);
     if(!userWorks){
         let works = [];
-        works.push(workId);
-        myUserWorkMap.set(author, works);
+        works.push(work.rows[0].id);
+        await myUserWorkMap.set(author, works);
     }else{
-        let test = userWorks.value;
-        test.push(workId);
-        myUserWorkMap.update(author, test);
+        let works = userWorks.value;
+        works.push(work.rows[0].id);
+        await myUserWorkMap.update(author, works);
     }
-    
-    myHashmap.set(workId, value); //workId, work info
+
     res.status(HTTP_CODES.SUCCESS.OK).json({ status: true, message: "You have created a beautiful piece of work!"});
 });
 
@@ -51,9 +55,25 @@ hashmapRouter.put("/change/:work_id", (req, res, next) => {
     res.status(HTTP_CODES.SUCCESS.OK).json({ status : true, message : "Your work has updated!" });
 });
 
-hashmapRouter.delete("/:work_id", (req, res, next) => {
-    const key = "work" + req.params.work_id;
-    res.status(HTTP_CODES.SUCCESS.OK).json(myHashmap.remove(key));
+hashmapRouter.delete("/:work_id", authenticateToken , async (req, res, next) => {
+    const key = req.params.work_id;
+    
+    //delete 
+    const response = await myHashmap.remove(key)
+    //update user works map
+    const userWorks = await myUserWorkMap.get(req.user.username);
+    console.log(userWorks, "@@@@@@@@@@@@@");
+    if(userWorks){
+        /*
+        let works = userWorks.value;
+        works.push(work.rows[0].id);
+        await myUserWorkMap.update(author, works);
+        */
+        const result = userWorks.value.filter((id) => id != key);
+        console.log("API DELETE TEST <----->", result);
+        await myUserWorkMap.update(req.user.username, result);
+    }
+    res.status(HTTP_CODES.SUCCESS.OK).json({ status : true, message : "Hippity hoppity, you have deleted your property!" });
 });
 
 export default hashmapRouter;

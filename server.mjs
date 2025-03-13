@@ -17,14 +17,15 @@ const logger = log(LOGG_LEVELS.VERBOSE);
 
 //----------------------------------------//
 
-//Middleware setup
 server.set('port', port);
+
+//Middleware setup
 server.use(logger);
 server.use(express.static('public'));
 server.use(express.json());
 
 //API Routers
-server.use("/user", userRouter)
+server.use("/user", userRouter);
 server.use("/hashmap", hashmapRouter);
 
 //----------------------------------------//

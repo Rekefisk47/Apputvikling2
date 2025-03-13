@@ -104,12 +104,14 @@ export async function init(pageData = null){
         const formDataObj = formDataToObject(formData);
         console.log(formDataObj);
         
+        document.getElementById("loading").showModal();
         let response = await changeWork(workData.key, formDataObj); 
         if(response.status){
             messagehandler(response.message);
             const profile = await getUserProfile();
             placeTemplate("profile-template.html", "profile.mjs", profile);
         }
+        document.getElementById("loading").close();
     });
 }
 
