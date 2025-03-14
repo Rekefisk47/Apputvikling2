@@ -8,10 +8,13 @@ const secretKey = process.env.SECRET_KEY;
 //------------------------------------//
 //SETS A COOKIE
 function generateToken(user) {
+    console.log("MAKE TOKEN OF THIS: ", user);
     // Payload contains the user information
     const payload = JSON.stringify({
-        userId: user.userId,
-        username: user.username,
+        userId: user.id,
+        username: user.value.username,
+        salt: user.value.salt,
+        password: user.value.password,
         expirationDate: Date.now() + 24 * 60 * 60 * 1000,
     });
 
@@ -59,8 +62,7 @@ export async function authenticateToken(req, res, next){
     const token = await cookieParser(req,res,next);
     
     if(!token){
-        res.status(HTTP_CODES.CLIENT_ERROR.UNAUTHORIZED).json({ status: false, message: "You are not logged in!"});
-        return;
+        return res.status(HTTP_CODES.CLIENT_ERROR.UNAUTHORIZED).json({ status: false, message: "You are not logged in!"});
     }
 
     const splitToken = token.split('.');
@@ -91,17 +93,3 @@ export async function authenticateToken(req, res, next){
     next();
 }
 //------------------------------------//
-
-
-//takes information and makes a base64 string
-//sign the information with a secretkey
-//makes the strings url friendly
-//adds base64 string and signature them to a token
-
-
-//gets the token 
-//splits url fridly base 64 and signature
-//removes the url fridly part
-//decod payload back to user information
-//creature signature for the decoded payload
-//checks if signature is the same as the one sents
