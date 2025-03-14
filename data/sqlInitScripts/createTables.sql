@@ -1,25 +1,16 @@
 
-CREATE TABLE "public"."works" (
-    "id" integer GENERATED ALWAYS AS IDENTITY,
-    "key" text NOT NULL,
-    "value" jsonb NOT NULL,
-    PRIMARY KEY ("id"),
-    UNIQUE ("key")
-); 
-
 CREATE TABLE "public"."users" (
     "id" integer GENERATED ALWAYS AS IDENTITY,
-    "key" text NOT NULL,
+    "key " text NOT NULL,
     "value" jsonb NOT NULL,
     PRIMARY KEY ("id"),
-    UNIQUE ("key")
+    UNIQUE ("key ")
 );
 
-CREATE TABLE "public"."user_work_map" (
+
+CREATE TABLE "public"."works" (
     "id" integer GENERATED ALWAYS AS IDENTITY,
-    "key" text NOT NULL,
     "value" jsonb NOT NULL,
-    PRIMARY KEY ("id"),
-    UNIQUE ("key")
+    PRIMARY KEY ("id")
 );
-
+ALTER TABLE "public"."works" ADD COLUMN "authorId" text NOT NULL;

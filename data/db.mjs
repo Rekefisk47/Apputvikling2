@@ -1,3 +1,4 @@
+
 import pkg from "pg";
 const { Client } = pkg;
 
@@ -7,8 +8,6 @@ const config = {
     //ssl: (process.env.DB_SSL === "true") ? process.env.DB_SSL : false,
 }
 
-//await client.connect();
-
 async function runQuery(query, ...values){
     const client = new Client(config);
     try{
@@ -16,20 +15,16 @@ async function runQuery(query, ...values){
         await client.connect();
         const result = await client.query(query, values);
 
-        /*
         if(result.rowCount <= 0 ){
-            throw new Error("No records created");
+            console.log(result);
+            throw new Error("Nothing happened in database!");
         } 
-        */
 
         console.log("Connected to database");
         return result;
 
     }catch(error){
 
-        //feilhåndtering
-        console.log("---------------------");
-        console.log(query);
         console.log("Connection error: ", error);
         return null;
         
@@ -52,4 +47,4 @@ async function purge(statement, ...values){
     return await runQuery(statement, ...values);
 }
 
-export { create, update, read, purge};
+export { create, update, read, purge };
