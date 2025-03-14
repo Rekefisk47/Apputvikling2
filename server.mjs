@@ -3,8 +3,10 @@ import express from 'express'
 import HTTP_CODES from './utils/httpCodes.mjs';
 import log from './modules/log.mjs';
 import { LOGG_LEVELS, eventLogger } from './modules/log.mjs';
-import userRouter from './routes/userAPI.mjs';
-import hashmapRouter from './routes/hashmapAPI.mjs';
+
+import userRouter from './routes/NEW_userAPI.mjs';
+import workRouter from './routes/NEW_workAPI.mjs';
+import usersWorksRouter from './routes/NEW_userWorkAPI.mjs';
 
 //----------------------------------------//
 
@@ -26,7 +28,8 @@ server.use(express.json());
 
 //API Routers
 server.use("/user", userRouter);
-server.use("/hashmap", hashmapRouter);
+server.use("/work", workRouter);
+server.use("/user-work", usersWorksRouter);
 
 //----------------------------------------//
  
