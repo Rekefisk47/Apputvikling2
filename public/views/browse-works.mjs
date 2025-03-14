@@ -21,7 +21,7 @@ export async function init(pageData = null) {
             div.style.padding = "10px";
             div.id = value.id;
             
-            div.innerHTML = `<h3 style="margin:0"> Title: <a href="#" id="link">${value.value.title}</a></h3> Author: ${value.value.author}`;
+            div.innerHTML = `<h2 style="margin:0"> Title: <a href="#" id="link">${value.value.title}</a></h2> Author: ${value.value.author}`;
             
             if(value.value.rating){
                 div.innerHTML += ` <br> Rating: ${value.value.rating} `;
