@@ -20,8 +20,8 @@ export function init(pageData = null) {
         //fetch response 
         document.getElementById("loading").showModal();
         let response =  await addUser(formDataObj);
+        document.getElementById("loading").close();
         messagehandler(response.message);
         placeTemplate("login-user-template.html", "login-user.mjs");
-        document.getElementById("loading").close();
     });
 }

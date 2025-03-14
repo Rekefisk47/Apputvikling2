@@ -68,12 +68,12 @@ export function init(pageData = null) {
         //give message
         document.getElementById("loading").showModal();
         const response =  await postWork(formDataObj);
+        document.getElementById("loading").close();
         messagehandler(response.message);
         if(response.work){
             const profile = await getProfile();
             placeTemplate("profile-template.html", "profile.mjs", profile); 
         }
-        document.getElementById("loading").close();
     });
     //---------------Add work--------------//
 }

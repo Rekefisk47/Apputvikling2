@@ -104,12 +104,12 @@ export async function init(pageData = null){
         
         document.getElementById("loading").showModal();
         let response = await editWork(pageData.id, formDataObj); 
+        document.getElementById("loading").close();
         messagehandler(response.message);
         if(response.work){
             const profile = await getProfile();
             placeTemplate("profile-template.html", "profile.mjs", profile);
         }
-        document.getElementById("loading").close();
     });
 }
 

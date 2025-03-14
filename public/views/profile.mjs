@@ -49,11 +49,11 @@ export async function init(pageData = null){
         
         document.getElementById("loading").showModal();
         const response =  await deleteUser();
+        document.getElementById("loading").close();
         if(response.result){
             placeTemplate("home-template.html", "home.mjs");
         }
         messagehandler(response.message);
-        document.getElementById("loading").close();
     });
 
 

@@ -20,11 +20,11 @@ export function init(pageData = null) {
        
         document.getElementById("loading").showModal();
         const profile = await getProfile();
+        document.getElementById("loading").close();
         if(profile.result){
             placeTemplate("profile-template.html", "profile.mjs", profile);
         }else{
             messagehandler(profile.message);
         }
-        document.getElementById("loading").close();
     });
 }

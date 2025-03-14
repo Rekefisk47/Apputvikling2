@@ -18,13 +18,11 @@ export function init(pageData = null) {
 
         //fetch response 
         document.getElementById("loading").showModal();
-        
         let response =  await loginUser(formDataObj);
+        document.getElementById("loading").close();
         messagehandler(response.message);
         if(response.storedUser){
             placeTemplate("home-template.html", "home.mjs");
         }
-
-        document.getElementById("loading").close();
     });
 }
