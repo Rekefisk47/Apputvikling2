@@ -22,6 +22,9 @@ export function init(pageData = null) {
         let response =  await addUser(formDataObj);
         document.getElementById("loading").close();
         messagehandler(response.message);
-        placeTemplate("login-user-template.html", "login-user.mjs");
+        if(response.user){
+            placeTemplate("login-user-template.html", "login-user.mjs");
+        }
+        document.getElementById("loading").close();
     });
 }
