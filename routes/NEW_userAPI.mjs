@@ -43,10 +43,11 @@ userRouter.post("/login", async (req, res, next) => {
         const storedSalt = storedUser.value.salt;
 
         const verified = verifyPassHash(password, storedHash, storedSalt);
-        console.log(verified);
         if(verified){
             generateAndSetCookie(storedUser, res); //COOKIE TIME
             res.status(HTTP_CODES.SUCCESS.OK).json({ message : "You are now logged in :)", storedUser });
+        }else{
+            throw new Error("Wrong username or password!");
         }
     } catch (error) {
         res.status(HTTP_CODES.CLIENT_ERROR.BAD_REQUEST).json({ message: error.message });
