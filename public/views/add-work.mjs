@@ -1,6 +1,6 @@
 import { placeTemplate } from "../modules/load-templates.mjs";
 import { formDataToObject } from "../modules/formData-to-object.mjs";
-import { addWork, getUserProfile } from "../modules/fetch-data.mjs";
+import { getProfile, postWork } from "../modules/fetch-data.mjs";
 import { messagehandler } from "../modules/message-handler.mjs";
 
 export function init(pageData = null) {
@@ -67,13 +67,11 @@ export function init(pageData = null) {
        
         //give message
         document.getElementById("loading").showModal();
-        const response =  await addWork(formDataObj);
-        const profile = await getUserProfile();
-        if(response.status){
-            messagehandler(response.message);
-            placeTemplate("profile-template.html", "profile.mjs", profile);
-        }else{
-            messagehandler(response.message);
+        const response =  await postWork(formDataObj);
+        messagehandler(response.message);
+        if(response.work){
+            const profile = await getProfile();
+            placeTemplate("profile-template.html", "profile.mjs", profile); 
         }
         document.getElementById("loading").close();
     });

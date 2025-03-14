@@ -4,7 +4,6 @@ import { addUser } from "../modules/fetch-data.mjs";
 import { messagehandler } from "../modules/message-handler.mjs";
 
 export function init(pageData = null) {
-    console.log("Create user script loaded");
 
     document.getElementById("login-user-link").addEventListener("click", () => {
         placeTemplate("login-user-template.html", "login-user.mjs");
@@ -21,13 +20,8 @@ export function init(pageData = null) {
         //fetch response 
         document.getElementById("loading").showModal();
         let response =  await addUser(formDataObj);
+        messagehandler(response.message);
+        placeTemplate("login-user-template.html", "login-user.mjs");
         document.getElementById("loading").close();
-
-        if(response.status){
-            messagehandler(response.message);
-            placeTemplate("login-user-template.html", "login-user.mjs");
-        }else{
-            messagehandler(response.message);
-        }
     });
 }

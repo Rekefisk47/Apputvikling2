@@ -1,13 +1,10 @@
 import { formDataToObject } from "../modules/formData-to-object.mjs";
 import { placeTemplate } from "../modules/load-templates.mjs";
 import { messagehandler } from "../modules/message-handler.mjs";
-import { changeWork } from "../modules/fetch-data.mjs";
-import { getUserProfile } from "../modules/fetch-data.mjs";
+import { editWork, getProfile } from "../modules/fetch-data.mjs";
 
 export async function init(pageData = null){
-    console.log("////", pageData);
 
-    const getWorkForm = document.getElementById("get-work-form");
     const changeWorkForm = document.getElementById("change-work-form");
 
     const tools = document.getElementById("tools");
@@ -55,38 +52,40 @@ export async function init(pageData = null){
     });
     //---------------iframe----------------//
 
+
+
     //---------------Get and place info--------------//
-    const workData = pageData;
+    const workData = pageData.value;
     if (workData) {
         addToForm(changeWorkForm, workData);
     }
     
     function addToForm(form, data) {
         
-        for(let value in data.value){
+        for(let value in data){
             const input = form.querySelector(`[name="${value}"]`);
 
             //if its a normal fields
             if(input && (input.type != "checkbox")){
-                input.value = data.value[value]; 
+                input.value = data[value]; 
             }
 
             //if checkbox field and there is an array
-            if(value === "genre" && Array.isArray(data.value[value])){       
-                data.value[value].forEach((value) => { 
+            if(value === "genre" && Array.isArray(data[value])){       
+                data[value].forEach((value) => { 
                     //only get boxes with same value
                     const checkbox = form.querySelector(`[value="${value}"]`);
                     checkbox.checked = true;
                 });
-            }else if(value === "genre" && !Array.isArray(data.value[value])){//if there is only one genre
-                const checkbox = form.querySelector(`[value="${data.value[value]}"]`);
+            }else if(value === "genre" && !Array.isArray(data[value])){//if there is only one genre
+                const checkbox = form.querySelector(`[value="${data[value]}"]`);
                 checkbox.checked = true;
             }
 
             //if iframe field
             if(value === "content"){
                 iframeDoc.open();
-                iframeDoc.write(`<!DOCTYPE html><html><body contenteditable="true">`+ data.value[value] +`</body></html>`);
+                iframeDoc.write(`<!DOCTYPE html><html><body contenteditable="true">`+ data[value] +`</body></html>`);
                 iframeDoc.close();
                 iframeDoc.addEventListener("click", iframeFocus);
             }
@@ -97,18 +96,17 @@ export async function init(pageData = null){
     //---------------Change work--------------//
     changeWorkForm.addEventListener("submit", async evt => {
         evt.preventDefault();
+
         const formData = new FormData(changeWorkForm);
         appendGenre(formData);  
         appendIframe(formData);
-        appendAuthorInfo(formData, workData);
         const formDataObj = formDataToObject(formData);
-        console.log(formDataObj);
         
         document.getElementById("loading").showModal();
-        let response = await changeWork(workData.key, formDataObj); 
-        if(response.status){
-            messagehandler(response.message);
-            const profile = await getUserProfile();
+        let response = await editWork(pageData.id, formDataObj); 
+        messagehandler(response.message);
+        if(response.work){
+            const profile = await getProfile();
             placeTemplate("profile-template.html", "profile.mjs", profile);
         }
         document.getElementById("loading").close();
@@ -133,9 +131,3 @@ function appendIframe(formData){
     formData.append('content', content);
 }
 //---------------Append iframe--------------//
-//---------------Append author--------------//
-function appendAuthorInfo(formData, workData){
-    formData.append('authorId', workData.value.authorId);
-    formData.append('author', workData.value.author);
-}
-//---------------Append author--------------//

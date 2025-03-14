@@ -6,12 +6,13 @@ export async function init(pageData = null) {
 
     let worksContainer = document.getElementById("works-container");
     document.getElementById("loading").showModal();
-    let works = await getAllWorks();
+    const works = await getAllWorks();
     document.getElementById("loading").close();
-    console.log("////", works);
 
-    if(works.status != false){
-        Object.entries(works).forEach(([key, value]) => {
+    if(works.works){
+        const array = works.works;
+        Object.entries(array).forEach(([key, value]) => {
+            
             const fieldset = document.createElement("fieldset");
             fieldset.className = "work-wrapper";
             fieldset.style.marginTop = "10px";
@@ -20,18 +21,21 @@ export async function init(pageData = null) {
             div.style.padding = "10px";
             div.id = value.id;
             
-            div.innerHTML = `<h3 style="margin:0"> Title: <a href="#" id="link">${value.value.title}</a></h3> Author: ${value.value.author} <br>`;
+            div.innerHTML = `<h3 style="margin:0"> Title: <a href="#" id="link">${value.value.title}</a></h3> Author: ${value.value.author}`;
+            
             if(value.value.rating){
-                div.innerHTML += `Rating: ${value.value.rating} `;
+                div.innerHTML += ` <br> Rating: ${value.value.rating} `;
             }
 
-            div.innerHTML += `<br> Genre: `
-            if(typeof value.value.genre === "string"){
-                div.innerHTML += `${value.value.genre}`;
-            }else if(Array.isArray(value.value.genre)){
-                value.value.genre.forEach(genre => {
-                    div.innerHTML += `${genre} || `
-                });
+            if(value.value.genre){
+                div.innerHTML += `<br> Genre: `
+                if(typeof value.value.genre === "string"){
+                    div.innerHTML += `${value.value.genre}`;
+                }else if(Array.isArray(value.value.genre)){
+                    value.value.genre.forEach(genre => {
+                        div.innerHTML += `${genre} || `
+                    });
+                }
             }
 
             if(value.value.summary){

@@ -2,7 +2,8 @@ import { placeTemplate } from "../modules/load-templates.mjs";
 import { messagehandler } from "../modules/message-handler.mjs";
 
 export function init(pageData = null) {
-    console.log(pageData);
+    
+    const value = pageData;
 
     const backBtn = document.getElementById("back");
     const backToTopBtn = document.getElementById("top");
@@ -11,10 +12,10 @@ export function init(pageData = null) {
     let summary = document.getElementById("summary");
     let content = document.getElementById("content");
 
-    title.innerHTML = pageData.title;
-    author.innerHTML = `<a href="#" id="authorLink">${pageData.author}</a>`
-    summary.innerHTML = pageData.summary;
-    content.innerHTML = pageData.content;
+    title.innerHTML = value.title;
+    author.innerHTML = `<a href="#" id="authorLink">${value.author}</a>`
+    summary.innerHTML = value.summary;
+    content.innerHTML = value.content;
 
     backBtn.addEventListener("click", (evt) => {
         evt.preventDefault();
