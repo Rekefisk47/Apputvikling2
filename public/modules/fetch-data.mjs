@@ -20,84 +20,46 @@ async function fetchData(method, url, formDataObj = null){
     }
 }
 
-
-//-----------------fetch-works---------------//
-export async function addWork(formDataObj) {
-    return fetchData("POST", "/hashmap", formDataObj);
-}
-
-export async function deleteWork(workId) {
-    console.log(workId);
-    return fetchData("DELETE", `/hashmap/${workId}`);
-}
-
-export async function getWork(formDataObj) {
-    return fetchData("GET", `/hashmap/${formDataObj.workId}`);
-}
-
-export async function getAllWorks() {
-    return fetchData("GET", "/hashmap");
-}
-
-export async function changeWork(workId, formDataObj) {
-    return fetchData("PUT", `/hashmap/change/${workId}`, formDataObj);
-}
-//-----------------fetch-works---------------//
-
-
 //-----------------fetch-users---------------//
-export async function addUser(formDataObj) {
-    return fetchData("POST", "/user/create", formDataObj);
+export async function addUser(formData) {
+    return fetchData("POST", "/user/create", formData);
 }
-
-export async function loginUser(formDataObj) {
-    return fetchData("POST", "/user/login", formDataObj);
+export async function loginUser(formData) {
+    return fetchData("POST", "/user/login", formData);
 }
-
-export async function getUser() {
-    return fetchData("GET", "/user/get");
+export async function changeUser(formData) {
+    return fetchData("PUT", "/user/change", formData);
 }
-
-export async function getUserProfile() {
-    return fetchData("GET", "/user/profile");
-}
-
-export async function changeUser(formDataObj) {
-    return fetchData("PUT", "/user/change", formDataObj);
-}
-
 export async function deleteUser() {
     return fetchData("DELETE", "/user/delete");
 }
+export async function getProfile() {
+    return fetchData("GET", "/user/profile");
+}
 //-----------------fetch-users---------------//
 
 
-/*
-const HTTP_METHODS = {
-    GET : "GET",
-    POST : "POST",
-    PATCH : "PATCH",
-    PUT : "PUT"
+//-----------------fetch-works---------------//
+export async function postWork(formData) {
+    return fetchData("POST", "/work/post", formData);
 }
-
-const API_ENDPOINTS = {
-    GetTree : "/tree",
+export async function editWork(work_id, formData) {
+    return fetchData("PUT", `/work/edit/${work_id}`, formData);
 }
-
-async function retrieveUsersTecTre(userId){
-    const tree = await runRequest(API_ENDPOINTS.GetTree);
+export async function getWork() {
+    return fetchData("GET", `/work/get/${work_id}`);
 }
-
-async function runRequest(path, method = HTTP_METHODS.GET, data = null){
-    const request = {
-        method,
-        headers: {
-            "Content-type": "application/json"
-        }
-    }
-
-    if(HTTP_METHODS.POST, HTTP_METHODS.PUT, HTTP_METHODS, PUT.any(method)){
-        request.body = JSON.stringify(data);
-    }
+export async function getAllWorks() {
+    return fetchData("GET", `/work/get-all`);
 }
-*/
+export async function deleteWork(work_id) {
+    return fetchData("DELETE", `/work/delete/${work_id}`);
+}
+//-----------------fetch-works---------------//
+
+
+//-----------------fetch-user-works---------------//
+export async function getAllUsersWorks(user_id) {
+    return fetchData(`GET`, `/user-work/get-works/${user_id}`);
+}
+//-----------------fetch-user-works---------------//
